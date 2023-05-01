@@ -1,0 +1,41 @@
+import { getRecoil } from "recoil-nexus";
+import { SamplesApi, UsersApi } from "../api/api";
+import { Configuration } from "../api/configuration";
+import { getLoggedUser, useLoggedUser } from "./user";
+import { addInfo } from "./info";
+import axios, { AxiosError } from "axios";
+
+function createConfig(): Configuration {
+    var accessToken = getLoggedUser()?.token;
+    return new Configuration({
+        basePath: "http://localhost:8000",
+        accessToken
+    })
+}
+
+export function createUsersApi(): UsersApi {
+    return new UsersApi(createConfig());
+}
+
+export function createSamplesApi(): SamplesApi {
+    return new SamplesApi(createConfig());
+}
+
+export async function callGuard<T>(fn: () => Promise<T>, customErrors?: Map<number, string>): Promise<T | null> {
+    try {
+        return await fn()
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            const e = error as AxiosError;
+            if (customErrors && e.response?.status && customErrors.has(e.response!.status)) {
+                addInfo("error", customErrors.get(e.response!.status)!);
+            } else {
+                addInfo("error", e.message);
+            }
+        } else {
+            addInfo("error", "Unknown error");
+            console.log(error);
+        }
+        return null;
+    }
+}
