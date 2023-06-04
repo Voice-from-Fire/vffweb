@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * 
@@ -41,6 +43,21 @@ export interface AudioFile {
     'format': string;
 }
 /**
+ * An enumeration.
+ * @export
+ * @enum {string}
+ */
+
+export const AudioStatus = {
+    Ok: 'ok',
+    Invalid: 'invalid',
+    Skip: 'skip'
+} as const;
+
+export type AudioStatus = typeof AudioStatus[keyof typeof AudioStatus];
+
+
+/**
  * 
  * @export
  * @interface HTTPValidationError
@@ -53,6 +70,107 @@ export interface HTTPValidationError {
      */
     'detail'?: Array<ValidationError>;
 }
+/**
+ * 
+ * @export
+ * @interface Label
+ */
+export interface Label {
+    /**
+     * 
+     * @type {number}
+     * @memberof Label
+     */
+    'id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Label
+     */
+    'creator': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Label
+     */
+    'sample': number;
+    /**
+     * 
+     * @type {AudioStatus}
+     * @memberof Label
+     */
+    'status': AudioStatus;
+    /**
+     * 
+     * @type {string}
+     * @memberof Label
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {Array<LabelTypeAndValue>}
+     * @memberof Label
+     */
+    'values': Array<LabelTypeAndValue>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface LabelCreate
+ */
+export interface LabelCreate {
+    /**
+     * 
+     * @type {AudioStatus}
+     * @memberof LabelCreate
+     */
+    'status': AudioStatus;
+    /**
+     * 
+     * @type {Array<LabelTypeAndValue>}
+     * @memberof LabelCreate
+     */
+    'values': Array<LabelTypeAndValue>;
+}
+
+
+/**
+ * An enumeration.
+ * @export
+ * @enum {string}
+ */
+
+export const LabelType = {
+    T: 't',
+    G: 'g'
+} as const;
+
+export type LabelType = typeof LabelType[keyof typeof LabelType];
+
+
+/**
+ * 
+ * @export
+ * @interface LabelTypeAndValue
+ */
+export interface LabelTypeAndValue {
+    /**
+     * 
+     * @type {LabelType}
+     * @memberof LabelTypeAndValue
+     */
+    'label_type': LabelType;
+    /**
+     * 
+     * @type {number}
+     * @memberof LabelTypeAndValue
+     */
+    'label_value': number;
+}
+
+
 /**
  * An enumeration.
  * @export
@@ -134,6 +252,8 @@ export interface Sample {
      */
     'audio_files': Array<AudioFile>;
 }
+
+
 /**
  * 
  * @export
@@ -159,6 +279,8 @@ export interface User {
      */
     'role': Role;
 }
+
+
 /**
  * 
  * @export
@@ -209,6 +331,8 @@ export interface UserRoleUpdate {
      */
     'role': Role;
 }
+
+
 /**
  * 
  * @export
@@ -355,6 +479,195 @@ export class AudioApi extends BaseAPI {
      */
     public getAudioAudioFilesFilenameGet(filename: string, options?: AxiosRequestConfig) {
         return AudioApiFp(this.configuration).getAudioAudioFilesFilenameGet(filename, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * LabelsApi - axios parameter creator
+ * @export
+ */
+export const LabelsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Create Label
+         * @param {number} sampleId 
+         * @param {LabelCreate} labelCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createLabelSamplesSampleIdLabelPost: async (sampleId: number, labelCreate: LabelCreate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sampleId' is not null or undefined
+            assertParamExists('createLabelSamplesSampleIdLabelPost', 'sampleId', sampleId)
+            // verify required parameter 'labelCreate' is not null or undefined
+            assertParamExists('createLabelSamplesSampleIdLabelPost', 'labelCreate', labelCreate)
+            const localVarPath = `/samples/{sample_id}/label`
+                .replace(`{${"sample_id"}}`, encodeURIComponent(String(sampleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication LoginManager required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "LoginManager", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(labelCreate, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Labels For Sample
+         * @param {number} sampleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLabelsForSampleSamplesSampleIdLabelsGet: async (sampleId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sampleId' is not null or undefined
+            assertParamExists('getLabelsForSampleSamplesSampleIdLabelsGet', 'sampleId', sampleId)
+            const localVarPath = `/samples/{sample_id}/labels`
+                .replace(`{${"sample_id"}}`, encodeURIComponent(String(sampleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication LoginManager required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "LoginManager", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * LabelsApi - functional programming interface
+ * @export
+ */
+export const LabelsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = LabelsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Create Label
+         * @param {number} sampleId 
+         * @param {LabelCreate} labelCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createLabelSamplesSampleIdLabelPost(sampleId: number, labelCreate: LabelCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createLabelSamplesSampleIdLabelPost(sampleId, labelCreate, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get Labels For Sample
+         * @param {number} sampleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLabelsForSampleSamplesSampleIdLabelsGet(sampleId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Label>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLabelsForSampleSamplesSampleIdLabelsGet(sampleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * LabelsApi - factory interface
+ * @export
+ */
+export const LabelsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = LabelsApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Create Label
+         * @param {number} sampleId 
+         * @param {LabelCreate} labelCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createLabelSamplesSampleIdLabelPost(sampleId: number, labelCreate: LabelCreate, options?: any): AxiosPromise<number> {
+            return localVarFp.createLabelSamplesSampleIdLabelPost(sampleId, labelCreate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Labels For Sample
+         * @param {number} sampleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLabelsForSampleSamplesSampleIdLabelsGet(sampleId: number, options?: any): AxiosPromise<Array<Label>> {
+            return localVarFp.getLabelsForSampleSamplesSampleIdLabelsGet(sampleId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * LabelsApi - object-oriented interface
+ * @export
+ * @class LabelsApi
+ * @extends {BaseAPI}
+ */
+export class LabelsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Create Label
+     * @param {number} sampleId 
+     * @param {LabelCreate} labelCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LabelsApi
+     */
+    public createLabelSamplesSampleIdLabelPost(sampleId: number, labelCreate: LabelCreate, options?: AxiosRequestConfig) {
+        return LabelsApiFp(this.configuration).createLabelSamplesSampleIdLabelPost(sampleId, labelCreate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Labels For Sample
+     * @param {number} sampleId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LabelsApi
+     */
+    public getLabelsForSampleSamplesSampleIdLabelsGet(sampleId: number, options?: AxiosRequestConfig) {
+        return LabelsApiFp(this.configuration).getLabelsForSampleSamplesSampleIdLabelsGet(sampleId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -512,15 +825,12 @@ export const SamplesApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Upload Sample
-         * @param {string} name 
-         * @param {Language} language 
+         * @param {string} language 
          * @param {File} file 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadSampleSamplesPost: async (name: string, language: Language, file: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'name' is not null or undefined
-            assertParamExists('uploadSampleSamplesPost', 'name', name)
+        uploadSampleSamplesPost: async (language: string, file: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'language' is not null or undefined
             assertParamExists('uploadSampleSamplesPost', 'language', language)
             // verify required parameter 'file' is not null or undefined
@@ -543,12 +853,8 @@ export const SamplesApiAxiosParamCreator = function (configuration?: Configurati
             await setOAuthToObject(localVarHeaderParameter, "LoginManager", [], configuration)
 
 
-            if (name !== undefined) { 
-                localVarFormParams.append('name', name as any);
-            }
-    
             if (language !== undefined) { 
-                localVarFormParams.append('language', new Blob([JSON.stringify(language)], { type: "application/json", }));
+                localVarFormParams.append('language', language as any);
             }
     
             if (file !== undefined) { 
@@ -623,14 +929,13 @@ export const SamplesApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Upload Sample
-         * @param {string} name 
-         * @param {Language} language 
+         * @param {string} language 
          * @param {File} file 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async uploadSampleSamplesPost(name: string, language: Language, file: File, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadSampleSamplesPost(name, language, file, options);
+        async uploadSampleSamplesPost(language: string, file: File, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadSampleSamplesPost(language, file, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -684,14 +989,13 @@ export const SamplesApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Upload Sample
-         * @param {string} name 
-         * @param {Language} language 
+         * @param {string} language 
          * @param {File} file 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadSampleSamplesPost(name: string, language: Language, file: File, options?: any): AxiosPromise<number> {
-            return localVarFp.uploadSampleSamplesPost(name, language, file, options).then((request) => request(axios, basePath));
+        uploadSampleSamplesPost(language: string, file: File, options?: any): AxiosPromise<number> {
+            return localVarFp.uploadSampleSamplesPost(language, file, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -752,15 +1056,14 @@ export class SamplesApi extends BaseAPI {
     /**
      * 
      * @summary Upload Sample
-     * @param {string} name 
-     * @param {Language} language 
+     * @param {string} language 
      * @param {File} file 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SamplesApi
      */
-    public uploadSampleSamplesPost(name: string, language: Language, file: File, options?: AxiosRequestConfig) {
-        return SamplesApiFp(this.configuration).uploadSampleSamplesPost(name, language, file, options).then((request) => request(this.axios, this.basePath));
+    public uploadSampleSamplesPost(language: string, file: File, options?: AxiosRequestConfig) {
+        return SamplesApiFp(this.configuration).uploadSampleSamplesPost(language, file, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -5,9 +5,9 @@ import { useRecoilValue } from "recoil";
 import { useLoggedUser } from "../common/user";
 import { callGuard, createSamplesApi } from "../common/service";
 import { Language, Sample } from "../api/api";
-import { LoadingWrapper } from "../components/LoadingWrapper";
+import { LoadingBar, LoadingWrapper } from "../components/LoadingWrapper";
 import { RecordingsTable } from "../components/RecordingsTable";
-import { Avatar, Box, Button, Fab, Grid, IconButton, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, Fab, Grid, IconButton, LinearProgress, Stack, Typography } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
 import PauseIcon from '@mui/icons-material/Pause';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -97,50 +97,6 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
 
     return <Grid container direction="column" spacing="10">
         <Grid item>
-            {/* <IconButton onClick={() => {
-                if (initing) {
-                    return
-                }
-
-                if (handler !== null) {
-                    clearInterval(handler);
-                    setHandler(null);
-                    service?.stopRecording();
-                } else {
-                    const rec = new RecorderService();
-                    rec.em.addEventListener('error', (evt) => {
-                        console.log(evt);
-                    });
-                    setService(rec);
-                    rec.startRecording()?.catch((e) => {
-                        console.log(e);
-                        addInfo("error", "Microphone initialization failed");
-                        setService(null);
-                    }).then(() => {
-                        const startTime = new Date().getTime();
-                        const handler = setInterval(() => {
-                            setTime(new Date().getTime() - startTime)
-                        }, 100);
-                        //setStartTime(startTime);
-
-                        rec.em.addEventListener('recording', (evt) => {
-                            setService(null);
-                            clearInterval(handler);
-                            setHandler(null);
-                            const endTime = new Date().getTime();
-                            let event = evt as any;
-                            console.log(event);
-                            props.setRecording({
-                                blobUrl: event.detail.recording.blobUrl,
-                                mimeType: event.detail.recording.mimeType,
-                                duration: (endTime - startTime) / 1000,
-                            });
-                        });
-
-                        setHandler(handler);
-                    });
-                }
-            }}> */}
             {handler ? <Fab sx={pauseFabStyle} onClick={() => {
                 clearInterval(handler!);
                 setHandler(null);
@@ -223,11 +179,21 @@ export function NewRecordingScreen() {
         });
         const file = new File([result.data], "");
 
+        setState(RecordingState.Uploading);
+
         const data = await callGuard(async () => {
-            return await api.uploadSampleSamplesPost("sample.data", /*Language.En*/ "en", file);
+            return await api.uploadSampleSamplesPost("en", file);
         });
 
-        console.log(data);
+        if (data) {
+            // Upload ok
+            addInfo("success", "Recording uploaded")
+            setState(RecordingState.Recording);
+
+        } else {
+            // Upload fail, error info provided by guard
+            setState(RecordingState.Replay);
+        }
     }
 
     const build_body = () => {
@@ -236,6 +202,8 @@ export function NewRecordingScreen() {
                 return <Recorder setRecording={onNewRecording} />
             case RecordingState.Replay:
                 return <Replay recording={recording!} onDiscard={onDiscard} onUpload={onUpload} />
+            case RecordingState.Uploading:
+                return <LoadingBar />
         }
     }
 

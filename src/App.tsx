@@ -1,19 +1,6 @@
-import React, { useState } from 'react';
 import './App.css';
 
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import { Alert, Divider, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Snackbar } from '@mui/material';
-import MicIcon from '@mui/icons-material/Mic';
-import LogoutIcon from '@mui/icons-material/Logout';
-import HearingIcon from '@mui/icons-material/Hearing';
-import AudioFileIcon from '@mui/icons-material/AudioFile';
-import PeopleIcon from '@mui/icons-material/People';
+import { Alert, Snackbar } from '@mui/material';
 import { LoginScreen } from './screens/LoginScreen';
 import { useRecoilState } from 'recoil';
 import { infoState } from './common/info';
