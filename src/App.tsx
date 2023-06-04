@@ -8,6 +8,7 @@ import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { MyRecordingsScreen } from './screens/MyRecordingsScreen';
 import { useLoggedUser } from './common/user';
 import { NewRecordingScreen } from './screens/NewRecordingScreen';
+import { UsersScreen } from './screens/UsersScreen';
 
 
 //import RecorderService from './recorder/RecorderService';
@@ -39,7 +40,10 @@ function App() {
         path: "/myrecordings",
         element: <MyRecordingsScreen />,
       },
-
+      {
+        path: "/users",
+        element: <UsersScreen />,
+      },
     ]
   }
 

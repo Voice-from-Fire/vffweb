@@ -56,7 +56,7 @@ export function MainDrawer(props: { open: boolean, setOpen: (v: boolean) => void
                     </ListItemButton>
                 </ListItem>
                 <Divider />
-                <ListItem disablePadding>
+                <ListItem disablePadding onClick={() => navigate("/users")}>
                     <ListItemButton>
                         <ListItemIcon>
                             <PeopleIcon />
