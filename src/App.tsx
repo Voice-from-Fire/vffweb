@@ -9,6 +9,7 @@ import { MyRecordingsScreen } from './screens/MyRecordingsScreen';
 import { useLoggedUser } from './common/user';
 import { NewRecordingScreen } from './screens/NewRecordingScreen';
 import { UsersScreen } from './screens/UsersScreen';
+import { CreateUserScreen } from './screens/CreateUserScreen';
 
 
 //import RecorderService from './recorder/RecorderService';
@@ -24,6 +25,10 @@ function App() {
       {
         path: "/*",
         element: <LoginScreen />
+      },
+      {
+        path: "/new",
+        element: <CreateUserScreen />,
       },
     ]
   } else {
@@ -43,6 +48,10 @@ function App() {
       {
         path: "/users",
         element: <UsersScreen />,
+      },
+      {
+        path: "/new",
+        element: <CreateUserScreen />,
       },
     ]
   }

@@ -8,6 +8,7 @@ import { addInfo } from "../common/info";
 import axios, { Axios, AxiosError } from "axios";
 import { NavigateFunction, useLocation, useNavigate } from "react-router";
 import { setLoggedUser } from "../common/user";
+import { autoLoginEnabled, autoLoginName, autoLoginPassword } from "../config";
 
 
 async function doLogin(navigate: NavigateFunction, location: string, username: string, password: string): Promise<void> {
@@ -52,15 +53,20 @@ export function LoginScreen() {
     const handleLogin = (event: { preventDefault: () => void; currentTarget: HTMLFormElement | undefined; }) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const username = data.get("name")?.toString();
-        const password = data.get("password")?.toString();
+        const username = data.get("name")?.toString()!;
+        const password = data.get("password")?.toString()!;
+        if (password.length === 0 || username.length === 0) {
+            return;
+        }
         if (username != null && password != null) {
             doLogin(navigate, location, username, password)
         }
     };
     useEffect(() => {
-        doLogin(navigate, location, "testadmin", "pass")
-    }, []);
+        if (autoLoginEnabled) {
+            doLogin(navigate, location, autoLoginName, autoLoginPassword)
+        }
+    }, [location, navigate]);
     return (<Box sx={{ flexGrow: 1 }}>
 
         <Container component="main" maxWidth="xs">
@@ -86,7 +92,7 @@ export function LoginScreen() {
                         name="name"
                         autoFocus
                         variant="standard"
-                        defaultValue="testadmin"
+                        defaultValue=""
                     />
                     <TextField
                         margin="normal"
@@ -98,7 +104,7 @@ export function LoginScreen() {
                         id="password"
                         autoComplete="current-password"
                         variant="standard"
-                        defaultValue="pass"
+                        defaultValue=""
                     />
                     <Button
                         type="submit"
@@ -109,6 +115,7 @@ export function LoginScreen() {
                         Login
                     </Button>
                     <Button
+                        onClick={() => navigate("/new")}
                         fullWidth
                         variant="outlined"
                         sx={{ mt: 3, mb: 2 }}
