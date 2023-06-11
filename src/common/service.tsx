@@ -4,11 +4,12 @@ import { Configuration } from "../api/configuration";
 import { getLoggedUser, useLoggedUser } from "./user";
 import { addInfo } from "./info";
 import axios, { AxiosError } from "axios";
+import { BASEPATH } from "../config";
 
 function createConfig(): Configuration {
     var accessToken = getLoggedUser()?.token;
     return new Configuration({
-        basePath: "http://localhost:8000",
+        basePath: BASEPATH,
         accessToken
     })
 }
