@@ -1,18 +1,11 @@
-import React, { useState } from 'react';
 
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import { Card, Divider, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HearingIcon from '@mui/icons-material/Hearing';
 import AudioFileIcon from '@mui/icons-material/AudioFile';
 import PeopleIcon from '@mui/icons-material/People';
-import { useRecoilValue } from 'recoil';
 import { setLoggedUser, useLoggedUser } from '../common/user';
 import { useNavigate } from 'react-router';
 
@@ -47,7 +40,7 @@ export function MainDrawer(props: { open: boolean, setOpen: (v: boolean) => void
                         <ListItemText primary="My recordings" />
                     </ListItemButton>
                 </ListItem>
-                <ListItem disablePadding>
+                <ListItem disablePadding onClick={() => navigate("/feedback")}>
                     <ListItemButton>
                         <ListItemIcon>
                             <HearingIcon />

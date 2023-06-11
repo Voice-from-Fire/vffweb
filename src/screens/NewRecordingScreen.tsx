@@ -1,13 +1,9 @@
 
 import { useEffect, useState } from "react";
 import { LoggedScreenWrapper } from "../components/LoggedScreenWrapper";
-import { useRecoilValue } from "recoil";
-import { useLoggedUser } from "../common/user";
 import { callGuard, createSamplesApi } from "../common/service";
-import { Language, Sample } from "../api/api";
-import { LoadingBar, LoadingWrapper } from "../components/LoadingWrapper";
-import { RecordingsTable } from "../components/RecordingsTable";
-import { Avatar, Box, Button, Fab, Grid, IconButton, LinearProgress, Stack, Typography } from "@mui/material";
+import { LoadingBar } from "../components/LoadingWrapper";
+import { Button, Fab, Grid, Typography } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
 import PauseIcon from '@mui/icons-material/Pause';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -15,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RecorderService from "../recorder/RecorderService";
 import { addInfo } from "../common/info";
 import axios from "axios";
+import { AudioPlayer } from "../components/AudioPlayer";
 
 
 type Recording = {
@@ -118,10 +115,7 @@ function Replay(props: { recording: Recording, onUpload: () => void, onDiscard: 
     return (
         <Grid container direction="column" spacing="10">
             <Grid item>
-                <audio controls>
-                    <source src={props.recording.blobUrl} type={props.recording.mimeType} />
-                    Your browser does not support the audio tag.
-                </audio>
+                <AudioPlayer url={props.recording.blobUrl} mimeType={props.recording.mimeType} />
             </Grid>
 
             <Grid item>

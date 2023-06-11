@@ -1,14 +1,8 @@
-import { Box, Button, Checkbox, Container, FormControlLabel, Grid, TextField, Typography } from "@mui/material";
-import logo from '../assets/images/logo.png';
-import React, { useEffect, useState } from "react";
-import { UsersApi, UsersApiAxiosParamCreator, UsersApiFp } from "../api/api";
-import { Configuration } from "../api/configuration";
+import { Box, Button, Container, Grid, TextField, Typography } from "@mui/material";
+import { useState } from "react";
 import { callGuard, createUsersApi } from "../common/service";
 import { addInfo } from "../common/info";
-import axios, { Axios, AxiosError } from "axios";
-import { NavigateFunction, useLocation, useNavigate } from "react-router";
-import { setLoggedUser } from "../common/user";
-import { autoLoginEnabled, autoLoginName, autoLoginPassword } from "../config";
+import { useNavigate } from "react-router";
 
 
 async function createAccount(code: string, name: string, password: string, email: string): Promise<boolean> {
@@ -38,7 +32,6 @@ export function CreateUserScreen() {
     const navigate = useNavigate();
 
     const handleSubmit = (event: { preventDefault: () => void; currentTarget: HTMLFormElement | undefined; }) => {
-        console.log("SUBMIT");
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         const code = data.get("code")?.toString()!;

@@ -13,7 +13,11 @@ export function QuickPlayer(props: { sample: Sample }) {
     const start = () => {
         setStartTime(10);
 
-        const audio = new Audio(audioUrl(props.sample));
+        const audio = new Audio();
+        const source = document.createElement('source');
+        source.setAttribute('src', audioUrl(props.sample));
+        // TODO FIX FOR Safari
+        audio.append(source);
         setAudio(audio);
         audio.play()
     };

@@ -1,7 +1,6 @@
-import { getRecoil } from "recoil-nexus";
 import { SamplesApi, UsersApi } from "../api/api";
 import { Configuration } from "../api/configuration";
-import { getLoggedUser, useLoggedUser } from "./user";
+import { getLoggedUser } from "./user";
 import { addInfo } from "./info";
 import axios, { AxiosError } from "axios";
 import { BASEPATH } from "../config";

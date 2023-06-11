@@ -1,11 +1,7 @@
-import { Box, Button, Checkbox, Container, FormControlLabel, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import logo from '../assets/images/logo.png';
-import React, { useEffect } from "react";
-import { UsersApi, UsersApiAxiosParamCreator, UsersApiFp } from "../api/api";
-import { Configuration } from "../api/configuration";
+import { useEffect } from "react";
 import { callGuard, createUsersApi } from "../common/service";
-import { addInfo } from "../common/info";
-import axios, { Axios, AxiosError } from "axios";
 import { NavigateFunction, useLocation, useNavigate } from "react-router";
 import { setLoggedUser } from "../common/user";
 import { autoLoginEnabled, autoLoginName, autoLoginPassword } from "../config";
