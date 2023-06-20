@@ -3,7 +3,6 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
   "/users": {
     /** Get All Users */
@@ -71,7 +70,7 @@ export interface components {
       /** Password */
       password: string;
       /**
-       * Scope 
+       * Scope
        * @default
        */
       scope?: string;
@@ -86,7 +85,7 @@ export interface components {
       name: string;
       language: components["schemas"]["Language"];
       /**
-       * File 
+       * File
        * Format: binary
        */
       file: string;
@@ -94,17 +93,17 @@ export interface components {
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
-      detail?: (components["schemas"]["ValidationError"])[];
+      detail?: components["schemas"]["ValidationError"][];
     };
     /**
-     * Language 
-     * @description An enumeration. 
+     * Language
+     * @description An enumeration.
      * @enum {unknown}
      */
     Language: "NV" | "en" | "cs";
     /**
-     * Role 
-     * @description An enumeration. 
+     * Role
+     * @description An enumeration.
      * @enum {string}
      */
     Role: "user" | "reviewer" | "moderator" | "admin";
@@ -116,14 +115,14 @@ export interface components {
       duration: number;
       language: components["schemas"]["Language"];
       /**
-       * Created At 
+       * Created At
        * Format: date-time
        */
       created_at?: string;
       /** Owner */
       owner?: number;
       /** Audio Files */
-      audio_files: (components["schemas"]["AudioFile"])[];
+      audio_files: components["schemas"]["AudioFile"][];
     };
     /** User */
     User: {
@@ -138,7 +137,7 @@ export interface components {
       /** Name */
       name: string;
       /**
-       * Email 
+       * Email
        * Format: email
        */
       email?: string;
@@ -179,14 +178,13 @@ export interface components {
 export type external = Record<string, never>;
 
 export interface operations {
-
   /** Get All Users */
   get_all_users_users_get: {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": (components["schemas"]["User"])[];
+          "application/json": components["schemas"]["User"][];
         };
       };
     };
@@ -219,7 +217,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": (components["schemas"]["UserSummary"])[];
+          "application/json": components["schemas"]["UserSummary"][];
         };
       };
     };
@@ -296,7 +294,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": (components["schemas"]["Sample"])[];
+          "application/json": components["schemas"]["Sample"][];
         };
       };
     };
@@ -389,7 +387,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": (components["schemas"]["Sample"])[];
+          "application/json": components["schemas"]["Sample"][];
         };
       };
       /** @description Validation Error */

@@ -1,173 +1,186 @@
 /* Copyright (c) 2019 Josh Sanderson */
 
-import EncoderWav from './encoder-wav-worker.js'
-import EncoderMp3 from './encoder-mp3-worker.js'
-import EncoderOgg from './encoder-ogg-worker.js'
+import EncoderWav from "./encoder-wav-worker.js";
+import EncoderMp3 from "./encoder-mp3-worker.js";
+import EncoderOgg from "./encoder-ogg-worker.js";
 
 export default class RecorderService {
   constructor(baseUrl) {
-    this.baseUrl = baseUrl
+    this.baseUrl = baseUrl;
 
-    window.AudioContext = window.AudioContext || window.webkitAudioContext
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-    this.em = document.createDocumentFragment()
+    this.em = document.createDocumentFragment();
 
-    this.state = 'inactive'
+    this.state = "inactive";
 
-    this.chunks = []
-    this.chunkType = ''
+    this.chunks = [];
+    this.chunkType = "";
 
-    this.encoderMimeType = 'audio/wav'
+    this.encoderMimeType = "audio/wav";
 
     this.config = {
       broadcastAudioProcessEvents: false,
       createAnalyserNode: false,
       createDynamicsCompressorNode: false,
       forceScriptProcessor: false,
-      manualEncoderId: 'wav',
+      manualEncoderId: "wav",
       micGain: 1.0,
       processorBufferSize: 2048,
       stopTracksAndCloseCtxWhenFinished: true,
-      usingMediaRecorder: typeof window.MediaRecorder !== 'undefined',
-      enableEchoCancellation: true
-    }
+      usingMediaRecorder: typeof window.MediaRecorder !== "undefined",
+      enableEchoCancellation: true,
+    };
   }
 
   createWorker(fn) {
     var js = fn
       .toString()
-      .replace(/^function\s*\(\)\s*{/, '')
-      .replace(/}$/, '')
-    var blob = new Blob([js])
-    return new Worker(URL.createObjectURL(blob))
+      .replace(/^function\s*\(\)\s*{/, "")
+      .replace(/}$/, "");
+    var blob = new Blob([js]);
+    return new Worker(URL.createObjectURL(blob));
   }
 
   startRecording(timeslice) {
-    if (this.state !== 'inactive') {
-      return
+    if (this.state !== "inactive") {
+      return;
     }
 
     // This is the case on ios/chrome, when clicking links from within ios/slack (sometimes), etc.
-    if (!navigator || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Missing support for navigator.mediaDevices.getUserMedia') // temp: helps when testing for strange issues on ios/safari
-      return
+    if (
+      !navigator ||
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ) {
+      alert("Missing support for navigator.mediaDevices.getUserMedia"); // temp: helps when testing for strange issues on ios/safari
+      return;
     }
 
-    this.audioCtx = new AudioContext()
-    this.micGainNode = this.audioCtx.createGain()
-    this.outputGainNode = this.audioCtx.createGain()
+    this.audioCtx = new AudioContext();
+    this.micGainNode = this.audioCtx.createGain();
+    this.outputGainNode = this.audioCtx.createGain();
 
     if (this.config.createDynamicsCompressorNode) {
-      this.dynamicsCompressorNode = this.audioCtx.createDynamicsCompressor()
+      this.dynamicsCompressorNode = this.audioCtx.createDynamicsCompressor();
     }
 
     if (this.config.createAnalyserNode) {
-      this.analyserNode = this.audioCtx.createAnalyser()
+      this.analyserNode = this.audioCtx.createAnalyser();
     }
 
     // If not using MediaRecorder(i.e. safari and edge), then a script processor is required. It's optional
     // on browsers using MediaRecorder and is only useful if wanting to do custom analysis or manipulation of
     // recorded audio data.
-    if (this.config.forceScriptProcessor || this.config.broadcastAudioProcessEvents || !this.config.usingMediaRecorder) {
-      this.processorNode = this.audioCtx.createScriptProcessor(this.config.processorBufferSize, 1, 1) // TODO: Get the number of channels from mic
+    if (
+      this.config.forceScriptProcessor ||
+      this.config.broadcastAudioProcessEvents ||
+      !this.config.usingMediaRecorder
+    ) {
+      this.processorNode = this.audioCtx.createScriptProcessor(
+        this.config.processorBufferSize,
+        1,
+        1
+      ); // TODO: Get the number of channels from mic
     }
 
     // Create stream destination on chrome/firefox because, AFAICT, we have no other way of feeding audio graph output
     // in to MediaRecorderSafari/Edge don't have this method as of 2018-04.
     if (this.audioCtx.createMediaStreamDestination) {
-      this.destinationNode = this.audioCtx.createMediaStreamDestination()
-    }
-    else {
-      this.destinationNode = this.audioCtx.destination
+      this.destinationNode = this.audioCtx.createMediaStreamDestination();
+    } else {
+      this.destinationNode = this.audioCtx.destination;
     }
 
     // Create web worker for doing the encoding
     if (!this.config.usingMediaRecorder) {
-      if (this.config.manualEncoderId === 'mp3') {
+      if (this.config.manualEncoderId === "mp3") {
         // This also works and avoids weirdness imports with workers
         // this.encoderWorker = new Worker(BASE_URL + '/workers/encoder-ogg-worker.js')
         /*  this.encoderWorker = this.createWorker(EncoderMp3)
           this.encoderWorker.postMessage(['init', { baseUrl: BASE_URL, sampleRate: this.audioCtx.sampleRate }])
           this.encoderMimeType = 'audio/mpeg'*/
-      }
-      else if (this.config.manualEncoderId === 'ogg') {
+      } else if (this.config.manualEncoderId === "ogg") {
         /*this.encoderWorker = this.createWorker(EncoderOgg)
         this.encoderWorker.postMessage(['init', { baseUrl: BASE_URL, sampleRate: this.audioCtx.sampleRate }])
         this.encoderMimeType = 'audio/ogg'*/
+      } else {
+        this.encoderWorker = this.createWorker(EncoderWav);
+        this.encoderMimeType = "audio/wav";
       }
-      else {
-        this.encoderWorker = this.createWorker(EncoderWav)
-        this.encoderMimeType = 'audio/wav'
-      }
-      this.encoderWorker.addEventListener('message', (e) => {
-        let event = new Event('dataavailable')
-        if (this.config.manualEncoderId === 'ogg') {
-          event.data = e.data
+      this.encoderWorker.addEventListener("message", (e) => {
+        let event = new Event("dataavailable");
+        if (this.config.manualEncoderId === "ogg") {
+          event.data = e.data;
+        } else {
+          event.data = new Blob(e.data, { type: this.encoderMimeType });
         }
-        else {
-          event.data = new Blob(e.data, { type: this.encoderMimeType })
-        }
-        this._onDataAvailable(event)
-      })
+        this._onDataAvailable(event);
+      });
     }
 
     // Setup media constraints
     const userMediaConstraints = {
       audio: {
-        echoCancellation: this.config.enableEchoCancellation
-      }
-    }
+        echoCancellation: this.config.enableEchoCancellation,
+      },
+    };
     if (this.config.deviceId) {
-      userMediaConstraints.audio.deviceId = this.config.deviceId
+      userMediaConstraints.audio.deviceId = this.config.deviceId;
     }
 
     // This will prompt user for permission if needed
-    return navigator.mediaDevices.getUserMedia(userMediaConstraints)
+    return navigator.mediaDevices
+      .getUserMedia(userMediaConstraints)
       .then((stream) => {
-        this._startRecordingWithStream(stream, timeslice)
+        this._startRecordingWithStream(stream, timeslice);
       })
       .catch((error) => {
-        alert('Error with getUserMedia: ' + error.message) // temp: helps when testing for strange issues on ios/safari
-        console.log(error)
-      })
+        alert("Error with getUserMedia: " + error.message); // temp: helps when testing for strange issues on ios/safari
+        console.log(error);
+      });
   }
 
   setMicGain(newGain) {
-    this.config.micGain = newGain
+    this.config.micGain = newGain;
     if (this.audioCtx && this.micGainNode) {
-      this.micGainNode.gain.setValueAtTime(newGain, this.audioCtx.currentTime)
+      this.micGainNode.gain.setValueAtTime(newGain, this.audioCtx.currentTime);
     }
   }
 
   _startRecordingWithStream(stream, timeslice) {
-    this.micAudioStream = stream
+    this.micAudioStream = stream;
 
-    this.inputStreamNode = this.audioCtx.createMediaStreamSource(this.micAudioStream)
-    this.audioCtx = this.inputStreamNode.context
+    this.inputStreamNode = this.audioCtx.createMediaStreamSource(
+      this.micAudioStream
+    );
+    this.audioCtx = this.inputStreamNode.context;
 
     // Kind-of a hack to allow hooking in to audioGraph inputStreamNode
     if (this.onGraphSetupWithInputStream) {
-      this.onGraphSetupWithInputStream(this.inputStreamNode)
+      this.onGraphSetupWithInputStream(this.inputStreamNode);
     }
 
-    this.inputStreamNode.connect(this.micGainNode)
-    this.micGainNode.gain.setValueAtTime(this.config.micGain, this.audioCtx.currentTime)
+    this.inputStreamNode.connect(this.micGainNode);
+    this.micGainNode.gain.setValueAtTime(
+      this.config.micGain,
+      this.audioCtx.currentTime
+    );
 
-    let nextNode = this.micGainNode
+    let nextNode = this.micGainNode;
     if (this.dynamicsCompressorNode) {
-      this.micGainNode.connect(this.dynamicsCompressorNode)
-      nextNode = this.dynamicsCompressorNode
+      this.micGainNode.connect(this.dynamicsCompressorNode);
+      nextNode = this.dynamicsCompressorNode;
     }
 
-    this.state = 'recording'
+    this.state = "recording";
 
     if (this.processorNode) {
-      nextNode.connect(this.processorNode)
-      this.processorNode.connect(this.outputGainNode)
-      this.processorNode.onaudioprocess = (e) => this._onAudioProcess(e)
-    }
-    else {
-      nextNode.connect(this.outputGainNode)
+      nextNode.connect(this.processorNode);
+      this.processorNode.connect(this.outputGainNode);
+      this.processorNode.onaudioprocess = (e) => this._onAudioProcess(e);
+    } else {
+      nextNode.connect(this.outputGainNode);
     }
 
     if (this.analyserNode) {
@@ -175,34 +188,37 @@ export default class RecorderService {
       //       processor node needs to be modified to copy input to output. It currently doesn't because it's not
       //       needed when doing manual encoding.
       // this.processorNode.connect(this.analyserNode)
-      nextNode.connect(this.analyserNode)
+      nextNode.connect(this.analyserNode);
     }
 
-    this.outputGainNode.connect(this.destinationNode)
+    this.outputGainNode.connect(this.destinationNode);
 
     if (this.config.usingMediaRecorder) {
-      this.mediaRecorder = new MediaRecorder(this.destinationNode.stream)
-      this.mediaRecorder.addEventListener('dataavailable', (evt) => this._onDataAvailable(evt))
-      this.mediaRecorder.addEventListener('error', (evt) => this._onError(evt))
+      this.mediaRecorder = new MediaRecorder(this.destinationNode.stream);
+      this.mediaRecorder.addEventListener("dataavailable", (evt) =>
+        this._onDataAvailable(evt)
+      );
+      this.mediaRecorder.addEventListener("error", (evt) => this._onError(evt));
 
-      this.mediaRecorder.start(timeslice)
-    }
-    else {
+      this.mediaRecorder.start(timeslice);
+    } else {
       // Output gain to zero to prevent feedback. Seems to matter only on Edge, though seems like should matter
       // on iOS too.  Matters on chrome when connecting graph to directly to audioCtx.destination, but we are
       // not able to do that when using MediaRecorder.
-      this.outputGainNode.gain.setValueAtTime(0, this.audioCtx.currentTime)
+      this.outputGainNode.gain.setValueAtTime(0, this.audioCtx.currentTime);
       // this.outputGainNode.gain.value = 0
 
       // Todo: Note that time slicing with manual wav encoderWav won't work. To allow it would require rewriting the encoderWav
       // to assemble all chunks at end instead of adding header to each chunk.
       if (timeslice) {
-        console.log('Time slicing without MediaRecorder is not yet supported. The resulting recording will not be playable.')
+        console.log(
+          "Time slicing without MediaRecorder is not yet supported. The resulting recording will not be playable."
+        );
         this.slicing = setInterval(function () {
-          if (this.state === 'recording') {
-            this.encoderWorker.postMessage(['dump', this.context.sampleRate])
+          if (this.state === "recording") {
+            this.encoderWorker.postMessage(["dump", this.context.sampleRate]);
           }
-        }, timeslice)
+        }, timeslice);
       }
     }
   }
@@ -218,12 +234,14 @@ export default class RecorderService {
     // this.onAudioEm.dispatch(new Event('onaudioprocess', {inputBuffer:inputBuffer,outputBuffer:outputBuffer}))
 
     if (this.config.broadcastAudioProcessEvents) {
-      this.em.dispatchEvent(new CustomEvent('onaudioprocess', {
-        detail: {
-          inputBuffer: e.inputBuffer,
-          outputBuffer: e.outputBuffer
-        }
-      }))
+      this.em.dispatchEvent(
+        new CustomEvent("onaudioprocess", {
+          detail: {
+            inputBuffer: e.inputBuffer,
+            outputBuffer: e.outputBuffer,
+          },
+        })
+      );
     }
 
     // // Example handling:
@@ -258,29 +276,33 @@ export default class RecorderService {
     // Safari and Edge require manual encoding via web worker. Single channel only for now.
     // Example stereo encoderWav: https://github.com/MicrosoftEdge/Demos/blob/master/microphone/scripts/recorderworker.js
     if (!this.config.usingMediaRecorder) {
-      if (this.state === 'recording') {
+      if (this.state === "recording") {
         if (this.config.broadcastAudioProcessEvents) {
-          this.encoderWorker.postMessage(['encode', e.outputBuffer.getChannelData(0)])
-        }
-        else {
-          this.encoderWorker.postMessage(['encode', e.inputBuffer.getChannelData(0)])
+          this.encoderWorker.postMessage([
+            "encode",
+            e.outputBuffer.getChannelData(0),
+          ]);
+        } else {
+          this.encoderWorker.postMessage([
+            "encode",
+            e.inputBuffer.getChannelData(0),
+          ]);
         }
       }
     }
   }
 
   stopRecording() {
-    if (this.state === 'inactive') {
-      return
+    if (this.state === "inactive") {
+      return;
     }
     if (this.config.usingMediaRecorder) {
-      this.state = 'inactive'
-      this.mediaRecorder.stop()
-    }
-    else {
-      this.state = 'inactive'
-      this.encoderWorker.postMessage(['dump', this.audioCtx.sampleRate])
-      clearInterval(this.slicing)
+      this.state = "inactive";
+      this.mediaRecorder.stop();
+    } else {
+      this.state = "inactive";
+      this.encoderWorker.postMessage(["dump", this.audioCtx.sampleRate]);
+      clearInterval(this.slicing);
 
       // TODO: There should be a more robust way to handle this
       // Without something like this, I think  the last recorded sample could be lost due to timing
@@ -295,73 +317,75 @@ export default class RecorderService {
     // console.log('state', this.mediaRecorder.state)
     // console.log('evt.data', evt.data)
 
-    this.chunks.push(evt.data)
-    this.chunkType = evt.data.type
+    this.chunks.push(evt.data);
+    this.chunkType = evt.data.type;
 
-    if (this.state !== 'inactive') {
-      return
+    if (this.state !== "inactive") {
+      return;
     }
 
-    let blob = new Blob(this.chunks, { 'type': this.chunkType })
-    let blobUrl = URL.createObjectURL(blob)
+    let blob = new Blob(this.chunks, { type: this.chunkType });
+    let blobUrl = URL.createObjectURL(blob);
     const recording = {
       ts: new Date().getTime(),
       blobUrl: blobUrl,
       mimeType: blob.type,
-      size: blob.size
-    }
+      size: blob.size,
+    };
 
-    this.chunks = []
-    this.chunkType = null
+    this.chunks = [];
+    this.chunkType = null;
 
     if (this.destinationNode) {
-      this.destinationNode.disconnect()
-      this.destinationNode = null
+      this.destinationNode.disconnect();
+      this.destinationNode = null;
     }
     if (this.outputGainNode) {
-      this.outputGainNode.disconnect()
-      this.outputGainNode = null
+      this.outputGainNode.disconnect();
+      this.outputGainNode = null;
     }
     if (this.analyserNode) {
-      this.analyserNode.disconnect()
-      this.analyserNode = null
+      this.analyserNode.disconnect();
+      this.analyserNode = null;
     }
     if (this.processorNode) {
-      this.processorNode.disconnect()
-      this.processorNode = null
+      this.processorNode.disconnect();
+      this.processorNode = null;
     }
     if (this.encoderWorker) {
-      this.encoderWorker.postMessage(['close'])
-      this.encoderWorker = null
+      this.encoderWorker.postMessage(["close"]);
+      this.encoderWorker = null;
     }
     if (this.dynamicsCompressorNode) {
-      this.dynamicsCompressorNode.disconnect()
-      this.dynamicsCompressorNode = null
+      this.dynamicsCompressorNode.disconnect();
+      this.dynamicsCompressorNode = null;
     }
     if (this.micGainNode) {
-      this.micGainNode.disconnect()
-      this.micGainNode = null
+      this.micGainNode.disconnect();
+      this.micGainNode = null;
     }
     if (this.inputStreamNode) {
-      this.inputStreamNode.disconnect()
-      this.inputStreamNode = null
+      this.inputStreamNode.disconnect();
+      this.inputStreamNode = null;
     }
 
     if (this.config.stopTracksAndCloseCtxWhenFinished) {
       // This removes the red bar in iOS/Safari
-      this.micAudioStream.getTracks().forEach((track) => track.stop())
-      this.micAudioStream = null
+      this.micAudioStream.getTracks().forEach((track) => track.stop());
+      this.micAudioStream = null;
 
-      this.audioCtx.close()
-      this.audioCtx = null
+      this.audioCtx.close();
+      this.audioCtx = null;
     }
 
-    this.em.dispatchEvent(new CustomEvent('recording', { detail: { recording: recording } }))
+    this.em.dispatchEvent(
+      new CustomEvent("recording", { detail: { recording: recording } })
+    );
   }
 
   _onError(evt) {
-    console.log('error', evt)
-    this.em.dispatchEvent(new Event('error'))
-    alert('error:' + evt) // for debugging purposes
+    console.log("error", evt);
+    this.em.dispatchEvent(new Event("error"));
+    alert("error:" + evt); // for debugging purposes
   }
 }
