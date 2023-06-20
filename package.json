@@ -32,7 +32,8 @@
     "eject": "react-scripts eject",
     "fmt": "prettier --write src public",
     "fmtcheck": "prettier --check src public",
-    "lint": "eslint src --max-warnings 0"
+    "lint": "eslint src --max-warnings 0",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -53,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "husky": "^8.0.3",
     "prettier": "2.8.8"
   }
 }
