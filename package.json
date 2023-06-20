@@ -32,7 +32,7 @@
     "eject": "react-scripts eject",
     "fmt": "prettier --write src public",
     "fmtcheck": "prettier --check src public",
-    "lint": "eslint src"
+    "lint": "eslint src --max-warnings 0"
   },
   "eslintConfig": {
     "extends": [
