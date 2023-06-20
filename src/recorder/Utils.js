@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export class Utils {
   // https://stackoverflow.com/a/14919494
   humanFileSize(bytes, si) {

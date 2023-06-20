@@ -1,5 +1,7 @@
 /* Copyright (c) 2019 Josh Sanderson */
 
+/* eslint-disable */
+
 import EncoderWav from "./encoder-wav-worker.js";
 import EncoderMp3 from "./encoder-mp3-worker.js";
 import EncoderOgg from "./encoder-ogg-worker.js";

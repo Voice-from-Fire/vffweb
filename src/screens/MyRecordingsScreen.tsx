@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { LoggedScreenWrapper } from "../components/LoggedScreenWrapper";
-import { useRecoilValue } from "recoil";
-import { useLoggedUser } from "../common/user";
 import { callGuard, createSamplesApi } from "../common/service";
 import { Sample } from "../api/api";
 import { LoadingWrapper } from "../components/LoadingWrapper";

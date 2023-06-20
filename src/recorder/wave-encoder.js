@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export const MimeType = "audio/wave";
 
 // Parts copied from https://github.com/chris-rudmin/Recorderjs
