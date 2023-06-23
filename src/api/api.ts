@@ -315,6 +315,25 @@ export interface UserCreate {
 /**
  *
  * @export
+ * @interface UserPasswordUpdate
+ */
+export interface UserPasswordUpdate {
+  /**
+   *
+   * @type {number}
+   * @memberof UserPasswordUpdate
+   */
+  id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof UserPasswordUpdate
+   */
+  password: string;
+}
+/**
+ *
+ * @export
  * @interface UserRoleUpdate
  */
 export interface UserRoleUpdate {
@@ -1716,6 +1735,69 @@ export const UsersApiAxiosParamCreator = function (
     },
     /**
      *
+     * @summary Update Password
+     * @param {UserPasswordUpdate} userPasswordUpdate
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updatePasswordUsersPasswordPatch: async (
+      userPasswordUpdate: UserPasswordUpdate,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'userPasswordUpdate' is not null or undefined
+      assertParamExists(
+        "updatePasswordUsersPasswordPatch",
+        "userPasswordUpdate",
+        userPasswordUpdate
+      );
+      const localVarPath = `/users/password`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "PATCH",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication LoginManager required
+      // oauth required
+      await setOAuthToObject(
+        localVarHeaderParameter,
+        "LoginManager",
+        [],
+        configuration
+      );
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        userPasswordUpdate,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
      * @summary Update Role
      * @param {UserRoleUpdate} userRoleUpdate
      * @param {*} [options] Override http request option.
@@ -1924,6 +2006,31 @@ export const UsersApiFp = function (configuration?: Configuration) {
     },
     /**
      *
+     * @summary Update Password
+     * @param {UserPasswordUpdate} userPasswordUpdate
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async updatePasswordUsersPasswordPatch(
+      userPasswordUpdate: UserPasswordUpdate,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updatePasswordUsersPasswordPatch(
+          userPasswordUpdate,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     *
      * @summary Update Role
      * @param {UserRoleUpdate} userRoleUpdate
      * @param {*} [options] Override http request option.
@@ -2050,6 +2157,21 @@ export const UsersApiFactory = function (
     },
     /**
      *
+     * @summary Update Password
+     * @param {UserPasswordUpdate} userPasswordUpdate
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updatePasswordUsersPasswordPatch(
+      userPasswordUpdate: UserPasswordUpdate,
+      options?: any
+    ): AxiosPromise<any> {
+      return localVarFp
+        .updatePasswordUsersPasswordPatch(userPasswordUpdate, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
      * @summary Update Role
      * @param {UserRoleUpdate} userRoleUpdate
      * @param {*} [options] Override http request option.
@@ -2165,6 +2287,23 @@ export class UsersApi extends BaseAPI {
         clientSecret,
         options
       )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @summary Update Password
+   * @param {UserPasswordUpdate} userPasswordUpdate
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof UsersApi
+   */
+  public updatePasswordUsersPasswordPatch(
+    userPasswordUpdate: UserPasswordUpdate,
+    options?: AxiosRequestConfig
+  ) {
+    return UsersApiFp(this.configuration)
+      .updatePasswordUsersPasswordPatch(userPasswordUpdate, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
