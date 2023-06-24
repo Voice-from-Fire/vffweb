@@ -1,7 +1,8 @@
-import Cookies from "js-cookie";
+import { useState } from "react";
 
 export const Preferences = {
   Language: "pref-language",
+  AudioInput: "pref-audio-input",
 };
 
 export function useStoredPreference<T>(
@@ -9,23 +10,23 @@ export function useStoredPreference<T>(
   defaultValue: T
 ): [T, (value: T) => void] {
   const key = Preferences[pref];
-  const storedValue = Cookies.get(key);
+  const storedValue = localStorage.getItem(key);
 
   let value: T = defaultValue;
-  if (storedValue !== undefined) {
+  if (storedValue !== null) {
     try {
       value = JSON.parse(storedValue);
     } catch (e) {
-      console.error(`Cannot deserialize cookie '${pref}'`);
+      console.error(`Cannot deserialize cookie '${pref}': ${e}`);
     }
   }
 
+  const [hookValue, setHookValue] = useState<T>(value);
   return [
-    value,
+    hookValue,
     (newValue: T) => {
-      Cookies.set(key, JSON.stringify(newValue), {
-        expires: 365, // Persist for a year
-      });
+      localStorage.setItem(key, JSON.stringify(newValue));
+      setHookValue(newValue);
     },
   ];
 }

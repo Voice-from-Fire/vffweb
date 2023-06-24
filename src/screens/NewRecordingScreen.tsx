@@ -35,6 +35,11 @@ type RecordingMetadata = {
   language: string;
 };
 
+type AudioInput = {
+  deviceId: string;
+  name: string;
+};
+
 enum RecordingState {
   Recording,
   Replay,
@@ -58,12 +63,41 @@ const iconStyle = {
   height: 30,
 };
 
+async function getAudioInputDevices(): Promise<AudioInput[]> {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  return devices
+    .filter((device) => device.kind === "audioinput")
+    .map((device) => ({
+      deviceId: device.deviceId,
+      name: device.label,
+    }));
+}
+
 function Recorder(props: { setRecording: (r: Recording) => void }) {
   const [service, setService] = useState<RecorderService | null>(null);
   const [handler, setHandler] = useState<NodeJS.Timer | null>(null);
-  //let [startTime, setStartTime] = useState<number>(0);
   const [time, setTime] = useState<number>(0);
+  const [audioInput, setAudioInput] = useStoredPreference<AudioInput | null>(
+    "AudioInput",
+    null
+  );
+  const [availableAudioInputs, setAvailableAudioInputs] = useState<
+    AudioInput[]
+  >([]);
 
+  useEffect(() => {
+    getAudioInputDevices().then((devices) => {
+      setAvailableAudioInputs(devices);
+      if (devices.length > 0 && audioInput === null) {
+        setAudioInput(devices[0]);
+      } else if (
+        devices.find((input) => input.deviceId === audioInput?.deviceId) ===
+        undefined
+      ) {
+        setAudioInput(null);
+      }
+    });
+  }, []);
   useEffect(
     () => () => {
       if (handler !== null) {
@@ -77,6 +111,13 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
 
   const startRecording = () => {
     const rec = new RecorderService();
+    if (audioInput !== null) {
+      console.debug(
+        `Selecting audio input ${audioInput.name} (${audioInput.deviceId})`
+      );
+      (rec.config as object as { deviceId: string }).deviceId =
+        audioInput.deviceId;
+    }
     rec.em.addEventListener("error", (evt) => {
       console.log(evt);
     });
@@ -93,7 +134,6 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
         const handler = setInterval(() => {
           setTime(new Date().getTime() - startTime);
         }, 100);
-        //setStartTime(startTime);
 
         rec.em.addEventListener("recording", (evt) => {
           setService(null);
@@ -114,8 +154,32 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
       });
   };
 
+  const hasAudioInputs = availableAudioInputs.length > 0 && audioInput !== null;
   return (
     <Grid container direction="column" spacing="10">
+      <Grid item>
+        {hasAudioInputs && (
+          <FormControl variant="filled">
+            <InputLabel>Audio input</InputLabel>
+            <Select
+              disabled={service !== null}
+              value={audioInput?.deviceId}
+              onChange={(event) => {
+                const device = availableAudioInputs.find(
+                  (device) => device.deviceId === event.target.value
+                );
+                setAudioInput(device ?? null);
+              }}
+            >
+              {availableAudioInputs.map((input) => (
+                <MenuItem key={input.deviceId} value={input.deviceId}>
+                  {input.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </Grid>
       <Grid item>
         {handler ? (
           <Fab
@@ -133,7 +197,6 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
             <MicIcon sx={iconStyle} />
           </Fab>
         )}
-        {/* </IconButton> */}
       </Grid>
       <Grid item>
         <Typography>
@@ -159,7 +222,6 @@ function Replay(props: {
   onDiscard: () => void;
 }) {
   const [language, setLanguage] = useState<string>(props.storedLanguage);
-
   return (
     <Grid container direction="column" spacing="10">
       <Grid item>

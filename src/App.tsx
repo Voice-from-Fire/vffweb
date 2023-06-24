@@ -12,10 +12,13 @@ import {
 import { MyRecordingsScreen } from "./screens/MyRecordingsScreen";
 import { useLoggedUser } from "./common/user";
 import { NewRecordingScreen } from "./screens/NewRecordingScreen";
+import { UploadAudioFileScreen } from "./screens/UploadAudioFileScreen";
 import { UsersScreen } from "./screens/UsersScreen";
 import { CreateUserScreen } from "./screens/CreateUserScreen";
 import { FeedbackScreen } from "./screens/FeedbackSceen";
 import { UserDetailScreen } from "./screens/UserDetailScreen";
+import { NotFoundScreen } from "./screens/NotFoundScreen";
+import { hasRequiredRole } from "./common/user";
 
 //import RecorderService from './recorder/RecorderService';
 
@@ -46,26 +49,42 @@ function App() {
         element: <NewRecordingScreen />,
       },
       {
+        path: "/Upload",
+        element: <UploadAudioFileScreen />,
+      },
+      {
         path: "/myrecordings",
         element: <MyRecordingsScreen />,
-      },
-      {
-        path: "/feedback",
-        element: <FeedbackScreen />,
-      },
-      {
-        path: "/users",
-        element: <UsersScreen />,
-      },
-      {
-        path: "/users/:userId",
-        element: <UserDetailScreen />,
       },
       {
         path: "/new",
         element: <CreateUserScreen />,
       },
+      {
+        path: "/*",
+        element: <NotFoundScreen />,
+      },
     ];
+
+    if (hasRequiredRole("reviewer")) {
+      paths.push({
+        path: "/feedback",
+        element: <FeedbackScreen />,
+      });
+    }
+
+    if (hasRequiredRole("admin")) {
+      paths.push(
+        {
+          path: "/users",
+          element: <UsersScreen />,
+        },
+        {
+          path: "/users/:userId",
+          element: <UserDetailScreen />,
+        }
+      );
+    }
   }
 
   const router = createBrowserRouter(paths);
