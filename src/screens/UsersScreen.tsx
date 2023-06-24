@@ -4,13 +4,13 @@ import { callGuard, createUsersApi } from "../common/service";
 import { LoggedScreenWrapper } from "../components/LoggedScreenWrapper";
 import { LoadingWrapper } from "../components/LoadingWrapper";
 import {
-  Link,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 
 async function downloadUsers(setData: (d: UserSummary[]) => void) {
   const api = createUsersApi();
@@ -43,7 +43,9 @@ export function UsersScreen() {
             {data?.map((userSummary) => (
               <TableRow key={userSummary.user.id}>
                 <TableCell align="right">
-                  <Link href="#">{userSummary.user.id}</Link>
+                  <Link to={userSummary.user.id.toString()}>
+                    {userSummary.user.id}
+                  </Link>
                 </TableCell>
                 <TableCell>{userSummary.user.name}</TableCell>
                 <TableCell>{userSummary.user.role}</TableCell>
