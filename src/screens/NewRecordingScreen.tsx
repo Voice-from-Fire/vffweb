@@ -67,9 +67,9 @@ async function getAudioInputDevices(): Promise<AudioInput[]> {
   const devices = await navigator.mediaDevices.enumerateDevices();
   return devices
     .filter((device) => device.kind === "audioinput")
-    .map((device) => ({
+    .map((device, i) => ({
       deviceId: device.deviceId,
-      name: device.label,
+      name: device.label.trim() || `Microphone ${i}`,
     }));
 }
 
