@@ -1,4 +1,4 @@
-import { SamplesApi, UsersApi } from "../api/api";
+import { LabelsApi, SamplesApi, UsersApi } from "../api/api";
 import { Configuration } from "../api/configuration";
 import { getLoggedUser } from "./user";
 import { addInfo } from "./info";
@@ -19,6 +19,10 @@ export function createUsersApi(): UsersApi {
 
 export function createSamplesApi(): SamplesApi {
   return new SamplesApi(createConfig());
+}
+
+export function createLabelsApi(): LabelsApi {
+  return new LabelsApi(createConfig());
 }
 
 export async function callGuard<T>(
