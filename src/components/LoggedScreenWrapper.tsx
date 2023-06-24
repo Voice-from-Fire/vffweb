@@ -8,7 +8,7 @@ export function LoggedScreenWrapper(props: {
   title: string;
   children: ReactNode;
 }) {
-  let [openDrawer, setOpenDrawer] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <MainDrawer open={openDrawer} setOpen={setOpenDrawer} />

@@ -12,10 +12,10 @@ async function doLogin(
   username: string,
   password: string
 ): Promise<void> {
-  let api = createUsersApi();
-  let customErrors = new Map();
+  const api = createUsersApi();
+  const customErrors = new Map();
   customErrors.set(401, "Invalid username or password");
-  let r = await callGuard(
+  const r = await callGuard(
     async () => await api.loginAuthTokenPost(username, password),
     customErrors
   );
@@ -39,7 +39,7 @@ async function doLogin(
   //     return;
   // }
 
-  let user = {
+  const user = {
     name: r.data["user"]["name"],
     role: r.data["user"]["role"],
     token: r.data["access_token"],
