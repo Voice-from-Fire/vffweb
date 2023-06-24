@@ -17,6 +17,8 @@ import { UsersScreen } from "./screens/UsersScreen";
 import { CreateUserScreen } from "./screens/CreateUserScreen";
 import { FeedbackScreen } from "./screens/FeedbackSceen";
 import { UserRecordingsScreen } from "./screens/UserRecordingsScreen";
+import { NotFoundScreen } from "./screens/NotFoundScreen";
+import { hasRequiredRole } from "./common/user";
 
 //import RecorderService from './recorder/RecorderService';
 
@@ -55,22 +57,34 @@ function App() {
         element: <MyRecordingsScreen />,
       },
       {
-        path: "/feedback",
-        element: <FeedbackScreen />,
-      },
-      {
-        path: "/users",
-        element: <UsersScreen />,
-      },
-      {
-        path: "/users/:userId",
-        element: <UserRecordingsScreen />,
-      },
-      {
         path: "/new",
         element: <CreateUserScreen />,
       },
+      {
+        path: "/*",
+        element: <NotFoundScreen />,
+      },
     ];
+
+    if (hasRequiredRole("reviewer")) {
+      paths.push({
+        path: "/feedback",
+        element: <FeedbackScreen />,
+      });
+    }
+
+    if (hasRequiredRole("admin")) {
+      paths.push(
+        {
+          path: "/users",
+          element: <UsersScreen />,
+        },
+        {
+          path: "/users/:userId",
+          element: <UserRecordingsScreen />,
+        }
+      );
+    }
   }
 
   const router = createBrowserRouter(paths);
