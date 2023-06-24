@@ -25,9 +25,8 @@ async function getUserRole(userId: number) {
   const api = createUsersApi();
   const data = await callGuard(async () => {
     // const result = await api.getUserRoleUserIdGet(userId);
-    const results = await api.getAllUsersUsersGet();
-    const user = results.data.find((user) => user.id === userId);
-    return user?.role;
+    const result = await api.getUserUsersUserIdGet(userId);
+    return result.data.role;
   });
   return data ?? undefined;
 }
