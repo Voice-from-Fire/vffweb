@@ -22,6 +22,7 @@ import { addInfo } from "../common/info";
 import axios from "axios";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { Language } from "../api/api";
+import { LanguageDisplay } from "../components/LanguageDisplay";
 
 type Recording = {
   blobUrl: string;
@@ -171,9 +172,15 @@ function Replay(props: {
               setLanguage(event.target.value)
             }
           >
-            <MenuItem value={Language.Cs}>Czech</MenuItem>
-            <MenuItem value={Language.En}>English</MenuItem>
-            <MenuItem value={Language.Nv}>Nonverbal</MenuItem>
+            <MenuItem value={Language.En}>
+              <LanguageDisplay language={Language.En} />
+            </MenuItem>
+            <MenuItem value={Language.Cs}>
+              <LanguageDisplay language={Language.Cs} />
+            </MenuItem>
+            <MenuItem value={Language.Nv}>
+              <LanguageDisplay language={Language.Nv} />
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>
