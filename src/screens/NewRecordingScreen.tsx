@@ -67,9 +67,9 @@ async function getAudioInputDevices(): Promise<AudioInput[]> {
   const devices = await navigator.mediaDevices.enumerateDevices();
   return devices
     .filter((device) => device.kind === "audioinput")
-    .map((device) => ({
+    .map((device, i) => ({
       deviceId: device.deviceId,
-      name: device.label,
+      name: device.label.trim() || `Microphone ${i + 1}`,
     }));
 }
 
@@ -156,10 +156,10 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
 
   const hasAudioInputs = availableAudioInputs.length > 0 && audioInput !== null;
   return (
-    <Grid container direction="column" spacing="10">
+    <Grid container direction="column" spacing="20" pt={2}>
       <Grid item>
         {hasAudioInputs && (
-          <FormControl variant="filled">
+          <FormControl variant="filled" style={{ width: 300 }}>
             <InputLabel>Audio input</InputLabel>
             <Select
               disabled={service !== null}
@@ -180,7 +180,7 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
           </FormControl>
         )}
       </Grid>
-      <Grid item>
+      <Grid item style={{ margin: "25px" }}>
         {handler ? (
           <Fab
             sx={pauseFabStyle}
@@ -203,7 +203,7 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
           {
             /* eslint-disable */
             initing
-              ? "Initing"
+              ? "Initializing"
               : handler === null
               ? "Ready to record"
               : `Recording ... ${(time / 1000).toFixed(1)}s`
@@ -223,16 +223,18 @@ function Replay(props: {
 }) {
   const [language, setLanguage] = useState<string>(props.storedLanguage);
   return (
-    <Grid container direction="column" spacing="10">
+    <Grid container direction="column" spacing="20" pt={2}>
       <Grid item>
-        <AudioPlayer
-          url={props.recording.blobUrl}
-          mimeType={props.recording.mimeType}
-        />
+        <span style={{ width: 295 }}>
+          <AudioPlayer
+            url={props.recording.blobUrl}
+            mimeType={props.recording.mimeType}
+          />
+        </span>
       </Grid>
 
-      <Grid mt="10px">
-        <FormControl variant="filled">
+      <Grid item>
+        <FormControl variant="filled" style={{ width: 300 }}>
           <InputLabel>Language</InputLabel>
           <Select
             label="Language"
