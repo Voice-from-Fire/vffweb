@@ -5,13 +5,13 @@ import { LoadingBar } from "../components/LoadingWrapper";
 import {
   Button,
   Fab,
-  Grid,
-  Typography,
-  Select,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
+  Select,
   SelectChangeEvent,
+  Typography,
 } from "@mui/material";
 import MicIcon from "@mui/icons-material/Mic";
 import PauseIcon from "@mui/icons-material/Pause";
@@ -23,6 +23,7 @@ import axios from "axios";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { Language } from "../api/api";
 import { LanguageDisplay } from "../components/LanguageDisplay";
+import { useStoredPreference } from "../common/preferences";
 
 type Recording = {
   blobUrl: string;
@@ -153,10 +154,11 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
 
 function Replay(props: {
   recording: Recording;
+  storedLanguage: string;
   onUpload: (metadata: RecordingMetadata) => void;
   onDiscard: () => void;
 }) {
-  const [language, setLanguage] = React.useState<string>("en");
+  const [language, setLanguage] = useState<string>(props.storedLanguage);
 
   return (
     <Grid container direction="column" spacing="10">
@@ -222,6 +224,10 @@ function Replay(props: {
 export function NewRecordingScreen() {
   const [state, setState] = useState<RecordingState>(RecordingState.Recording);
   const [recording, setRecording] = useState<Recording | null>(null);
+  const [storedLanguage, setStoredLanguage] = useStoredPreference<string>(
+    "Language",
+    Language.En
+  );
 
   useEffect(
     () => () => {
@@ -269,6 +275,7 @@ export function NewRecordingScreen() {
       // Upload ok
       addInfo("success", "Recording uploaded");
       setState(RecordingState.Recording);
+      setStoredLanguage(metadata.language);
     } else {
       // Upload fail, error info provided by guard
       setState(RecordingState.Replay);
@@ -282,6 +289,7 @@ export function NewRecordingScreen() {
       case RecordingState.Replay:
         return (
           <Replay
+            storedLanguage={storedLanguage}
             recording={recording!}
             onDiscard={onDiscard}
             onUpload={onUpload}
