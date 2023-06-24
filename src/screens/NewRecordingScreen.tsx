@@ -77,7 +77,10 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
   const [service, setService] = useState<RecorderService | null>(null);
   const [handler, setHandler] = useState<NodeJS.Timer | null>(null);
   const [time, setTime] = useState<number>(0);
-  const [audioInput, setAudioInput] = useState<AudioInput | null>(null);
+  const [audioInput, setAudioInput] = useStoredPreference<AudioInput | null>(
+    "AudioInput",
+    null
+  );
   const [availableAudioInputs, setAvailableAudioInputs] = useState<
     AudioInput[]
   >([]);
@@ -85,9 +88,12 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
   useEffect(() => {
     getAudioInputDevices().then((devices) => {
       setAvailableAudioInputs(devices);
-      if (devices.length > 0) {
+      if (devices.length > 0 && audioInput === null) {
         setAudioInput(devices[0]);
-      } else {
+      } else if (
+        devices.find((input) => input.deviceId === audioInput?.deviceId) ===
+        undefined
+      ) {
         setAudioInput(null);
       }
     });

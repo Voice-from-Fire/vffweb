@@ -1,7 +1,9 @@
 import Cookies from "js-cookie";
+import { useState } from "react";
 
 export const Preferences = {
   Language: "pref-language",
+  AudioInput: "pref-audio-input",
 };
 
 export function useStoredPreference<T>(
@@ -20,12 +22,14 @@ export function useStoredPreference<T>(
     }
   }
 
+  const [hookValue, setHookValue] = useState<T>(value);
   return [
-    value,
+    hookValue,
     (newValue: T) => {
       Cookies.set(key, JSON.stringify(newValue), {
         expires: 365, // Persist for a year
       });
+      setHookValue(newValue);
     },
   ];
 }
