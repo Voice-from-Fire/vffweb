@@ -3,6 +3,7 @@ import {
   Button,
   Container,
   Grid,
+  LinearProgress,
   TextField,
   Typography,
 } from "@mui/material";
@@ -10,6 +11,9 @@ import { useState } from "react";
 import { callGuard, createUsersApi } from "../common/service";
 import { addInfo } from "../common/info";
 import { useNavigate } from "react-router";
+
+const USERNAME_REGEX = new RegExp("^[a-zA-Z0-9]{3,30}$");
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 async function createAccount(
   code: string,
@@ -36,13 +40,10 @@ async function createAccount(
   return r !== null;
 }
 
-type Err = {
-  name?: string;
-  password?: string;
-};
-
 export function CreateUserScreen() {
-  const [err, setErr] = useState<Err>({});
+  const [usernameErr, setUsernameErr] = useState<string | null>(null);
+  const [passwordErr, setPasswordErr] = useState<string | null>(null);
+  const [emailErr, setEmailErr] = useState<string | null>(null);
   const [inProgress, setInProgress] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -59,19 +60,23 @@ export function CreateUserScreen() {
     const password2 = data.get("password2")?.toString()!;
     const email = data.get("email")?.toString()!;
 
-    const e: Err = {};
+    if (!username) {
+      setUsernameErr("Fill in username");
+    }
 
-    if (username.length < 3) {
-      e.name = "Username needs at least 3 characters";
+    if (!password) {
+      setPasswordErr("Fill in password");
+    }
+
+    if (password !== password2) {
+      setPasswordErr("Passwords do not match");
     }
 
     if (password.length < 8) {
-      e.password = "Password needs at least 8 characters";
-    } else if (password !== password2) {
-      e.password = "Passwords do not match";
+      setPasswordErr("Password needs at least 8 characters");
     }
-    if (e.name !== undefined || e.password !== undefined) {
-      setErr(e);
+
+    if (usernameErr || passwordErr) {
       return;
     }
     setInProgress(true);
@@ -87,6 +92,7 @@ export function CreateUserScreen() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
+      {inProgress && <LinearProgress />}
       <Container component="main" maxWidth="xs">
         <Box
           sx={{
@@ -122,6 +128,24 @@ export function CreateUserScreen() {
             />
 
             <TextField
+              onChange={(event) => {
+                const username = event.target.value;
+                if (username.length == 0) {
+                  setUsernameErr(null);
+                } else if (username.length < 3) {
+                  setUsernameErr("Username needs at least 3 characters");
+                } else if (username.length > 30) {
+                  setUsernameErr("Username can't be longer than 30 characters");
+                } else if (!USERNAME_REGEX.test(username)) {
+                  setUsernameErr(
+                    "Username can containy only numbers and digits"
+                  );
+                } else {
+                  setUsernameErr(null);
+                }
+              }}
+              error={Boolean(usernameErr)}
+              helperText={usernameErr}
               margin="normal"
               required
               fullWidth
@@ -131,10 +155,18 @@ export function CreateUserScreen() {
               autoFocus
               variant="standard"
               defaultValue=""
-              error={err.name !== undefined}
-              helperText={err.name}
             />
             <TextField
+              onChange={(event) => {
+                const password = event.target.value;
+                if (password.length < 8) {
+                  setPasswordErr("Password needs at least 8 characters");
+                } else {
+                  setPasswordErr(null);
+                }
+              }}
+              error={Boolean(passwordErr)}
+              helperText={passwordErr}
               margin="normal"
               required
               fullWidth
@@ -144,8 +176,6 @@ export function CreateUserScreen() {
               id="password"
               variant="standard"
               defaultValue=""
-              error={err.password !== undefined}
-              helperText={err.password}
             />
             <TextField
               margin="normal"
@@ -159,6 +189,18 @@ export function CreateUserScreen() {
               defaultValue=""
             />
             <TextField
+              onChange={(event) => {
+                const email = event.target.value;
+                if (!email) {
+                  setEmailErr(null);
+                } else if (!EMAIL_REGEX.test(email)) {
+                  setEmailErr("Invalid email");
+                } else {
+                  setEmailErr(null);
+                }
+              }}
+              error={Boolean(emailErr)}
+              helperText={emailErr}
               margin="normal"
               required
               fullWidth
