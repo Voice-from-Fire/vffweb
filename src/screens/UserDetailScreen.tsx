@@ -7,7 +7,10 @@ import { LoggedScreenWrapper } from "../components/LoggedScreenWrapper";
 import { RecordingsTable } from "../components/RecordingsTable";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 import CenteredBox from "../components/CenteredBox";
+import { Box } from "@mui/material";
 
 async function downloadUserSamples(
   userId: number,
@@ -39,13 +42,25 @@ async function changeUserRole(userId: number, role: Role) {
   return data;
 }
 
+async function resetUserPassword(userId: number, newPassword: string) {
+  const api = createUsersApi();
+  const data = await callGuard(async () => {
+    await api.updatePasswordUsersPasswordPatch({
+      id: userId,
+      password: newPassword,
+    });
+  });
+  return data;
+}
+
 const userRoles = Object.values(Role);
 
-export function UserRecordingsScreen() {
+export function UserDetailScreen() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState<Sample[] | null>(null);
   const [role, setRole] = useState<Role | undefined>(undefined); // for user role
+  const [newPassword, setNewPassword] = useState<string>(""); // state for the new password
 
   useEffect(() => {
     if (userId === undefined || isNaN(parseInt(userId))) {
@@ -65,6 +80,16 @@ export function UserRecordingsScreen() {
     changeUserRole(parseInt(userId!), event.target.value as Role);
   };
 
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewPassword(event.target.value);
+  };
+
+  const handlePasswordReset = () => {
+    resetUserPassword(parseInt(userId!), newPassword).then(() => {
+      setNewPassword("");
+    });
+  };
+
   return (
     <LoggedScreenWrapper
       title={"recordings of user #" + userId}
@@ -72,18 +97,39 @@ export function UserRecordingsScreen() {
     >
       <LoadingWrapper loaded={data !== null}>
         <CenteredBox>
-          <Select
-            value={role}
-            onChange={handleChange}
-            displayEmpty
-            inputProps={{ "aria-label": "Without label" }}
-          >
-            {userRoles.map((role, index) => (
-              <MenuItem key={index} value={role}>
-                {role}
-              </MenuItem>
-            ))}
-          </Select>
+          <Box>
+            Role: &nbsp;
+            <Select
+              value={role ?? ""}
+              onChange={handleChange}
+              displayEmpty
+              inputProps={{ "aria-label": "Without label" }}
+            >
+              {userRoles.map((role, index) => (
+                <MenuItem key={index} value={role}>
+                  {role}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+
+          <Box>
+            <TextField
+              value={newPassword}
+              onChange={handlePasswordChange}
+              label="New Password"
+              type="password"
+              variant="standard"
+            />
+            <Button
+              onClick={handlePasswordReset}
+              variant="contained"
+              color="primary"
+            >
+              Reset Password
+            </Button>
+          </Box>
+
           <RecordingsTable data={data ? data : []} />
         </CenteredBox>
       </LoadingWrapper>

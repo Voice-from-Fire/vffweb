@@ -15,7 +15,7 @@ import { NewRecordingScreen } from "./screens/NewRecordingScreen";
 import { UsersScreen } from "./screens/UsersScreen";
 import { CreateUserScreen } from "./screens/CreateUserScreen";
 import { FeedbackScreen } from "./screens/FeedbackSceen";
-import { UserRecordingsScreen } from "./screens/UserRecordingsScreen";
+import { UserDetailScreen } from "./screens/UserDetailScreen";
 
 //import RecorderService from './recorder/RecorderService';
 
@@ -59,7 +59,7 @@ function App() {
       },
       {
         path: "/users/:userId",
-        element: <UserRecordingsScreen />,
+        element: <UserDetailScreen />,
       },
       {
         path: "/new",

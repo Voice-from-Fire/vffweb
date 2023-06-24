@@ -8,6 +8,7 @@ const CenteredBox: FC<{ children: ReactNode }> = ({ children }) => {
       flexDirection="column"
       alignItems="center"
       minHeight="100vh"
+      gap={3}
     >
       {children}
     </Box>
