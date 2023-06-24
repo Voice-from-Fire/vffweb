@@ -12,6 +12,7 @@ import {
 import { MyRecordingsScreen } from "./screens/MyRecordingsScreen";
 import { useLoggedUser } from "./common/user";
 import { NewRecordingScreen } from "./screens/NewRecordingScreen";
+import { UploadAudioFileScreen } from "./screens/UploadAudioFileScreen";
 import { UsersScreen } from "./screens/UsersScreen";
 import { CreateUserScreen } from "./screens/CreateUserScreen";
 import { FeedbackScreen } from "./screens/FeedbackSceen";
@@ -44,6 +45,10 @@ function App() {
       {
         path: "/record",
         element: <NewRecordingScreen />,
+      },
+      {
+        path: "/Upload",
+        element: <UploadAudioFileScreen />,
       },
       {
         path: "/myrecordings",

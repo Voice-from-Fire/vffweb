@@ -4,26 +4,21 @@ import { callGuard, createSamplesApi } from "../common/service";
 import { LoadingBar } from "../components/LoadingWrapper";
 import {
   Button,
-  Fab,
-  FormControl,
   Grid,
+  Select,
+  FormControl,
   InputLabel,
   MenuItem,
-  Select,
   SelectChangeEvent,
-  Typography,
 } from "@mui/material";
-import MicIcon from "@mui/icons-material/Mic";
-import PauseIcon from "@mui/icons-material/Pause";
 import UploadIcon from "@mui/icons-material/Upload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import RecorderService from "../recorder/RecorderService";
 import { addInfo } from "../common/info";
 import axios from "axios";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { Language } from "../api/api";
 import { LanguageDisplay } from "../components/LanguageDisplay";
-import { useStoredPreference } from "../common/preferences";
+import { FileUploader } from "react-drag-drop-files";
 
 type Recording = {
   blobUrl: string;
@@ -36,128 +31,32 @@ type RecordingMetadata = {
 };
 
 enum RecordingState {
-  Recording,
+  Idle,
   Replay,
   Uploading,
 }
 
-const micFabStyle = {
-  width: 80,
-  height: 80,
-  backgroundColor: "primary.main",
-};
+const fileTypes = ["mp3", "ogg", "webm"];
 
-const pauseFabStyle = {
-  width: 80,
-  height: 80,
-  backgroundColor: "#dd8080",
-};
-
-const iconStyle = {
-  width: 30,
-  height: 30,
-};
-
-function Recorder(props: { setRecording: (r: Recording) => void }) {
-  const [service, setService] = useState<RecorderService | null>(null);
-  const [handler, setHandler] = useState<NodeJS.Timer | null>(null);
-  const [time, setTime] = useState<number>(0);
-
-  useEffect(
-    () => () => {
-      if (handler !== null) {
-        clearInterval(handler);
-      }
-    },
-    [handler]
-  );
-
-  const initing = service !== null && handler === null;
-
-  const startRecording = () => {
-    const rec = new RecorderService();
-    rec.em.addEventListener("error", (evt) => {
-      console.log(evt);
+function DragDrop(props: { setRecording: (r: Recording) => void }) {
+  const handleChange = (file: File) => {
+    props.setRecording({
+      blobUrl: URL.createObjectURL(file),
+      mimeType: file.type,
+      duration: file.size,
     });
-    setService(rec);
-    rec
-      .startRecording()
-      ?.catch((e) => {
-        console.log(e);
-        addInfo("error", "Microphone initialization failed");
-        setService(null);
-      })
-      .then(() => {
-        const startTime = new Date().getTime();
-        const handler = setInterval(() => {
-          setTime(new Date().getTime() - startTime);
-        }, 100);
-        //setStartTime(startTime);
-
-        rec.em.addEventListener("recording", (evt) => {
-          setService(null);
-          clearInterval(handler);
-          setHandler(null);
-          const endTime = new Date().getTime();
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const event = evt as any;
-          console.log(event);
-          props.setRecording({
-            blobUrl: event.detail.recording.blobUrl,
-            mimeType: event.detail.recording.mimeType,
-            duration: (endTime - startTime) / 1000,
-          });
-        });
-
-        setHandler(handler);
-      });
   };
-
   return (
-    <Grid container direction="column" spacing="10">
-      <Grid item>
-        {handler ? (
-          <Fab
-            sx={pauseFabStyle}
-            onClick={() => {
-              clearInterval(handler!);
-              setHandler(null);
-              service?.stopRecording();
-            }}
-          >
-            <PauseIcon sx={iconStyle} />
-          </Fab>
-        ) : (
-          <Fab sx={micFabStyle} onClick={startRecording}>
-            <MicIcon sx={iconStyle} />
-          </Fab>
-        )}
-        {/* </IconButton> */}
-      </Grid>
-      <Grid item>
-        <Typography>
-          {
-            /* eslint-disable */
-            initing
-              ? "Initing"
-              : handler === null
-              ? "Ready to record"
-              : `Recording ... ${(time / 1000).toFixed(1)}s`
-            /* eslint-enable */
-          }
-        </Typography>
-      </Grid>
-    </Grid>
+    <FileUploader handleChange={handleChange} name="file" types={fileTypes} />
   );
 }
 
 function Replay(props: {
   recording: Recording;
-  storedLanguage: string;
   onUpload: (metadata: RecordingMetadata) => void;
   onDiscard: () => void;
 }) {
-  const [language, setLanguage] = useState<string>(props.storedLanguage);
+  const [language, setLanguage] = React.useState<string>("en");
 
   return (
     <Grid container direction="column" spacing="10">
@@ -220,13 +119,9 @@ function Replay(props: {
   );
 }
 
-export function NewRecordingScreen() {
-  const [state, setState] = useState<RecordingState>(RecordingState.Recording);
+export function UploadAudioFileScreen() {
+  const [state, setState] = useState<RecordingState>(RecordingState.Idle);
   const [recording, setRecording] = useState<Recording | null>(null);
-  const [storedLanguage, setStoredLanguage] = useStoredPreference<string>(
-    "Language",
-    Language.En
-  );
 
   useEffect(
     () => () => {
@@ -237,6 +132,14 @@ export function NewRecordingScreen() {
     [recording]
   );
 
+  const onDiscard = () => {
+    if (recording) {
+      URL.revokeObjectURL(recording.blobUrl);
+      setRecording(null);
+      setState(RecordingState.Idle);
+    }
+  };
+
   const onNewRecording = (recording: Recording) => {
     if (recording.duration < 0.05 /* TODO 1.5 */) {
       URL.revokeObjectURL(recording.blobUrl);
@@ -245,14 +148,6 @@ export function NewRecordingScreen() {
     }
     setRecording(recording);
     setState(RecordingState.Replay);
-  };
-
-  const onDiscard = () => {
-    if (recording) {
-      URL.revokeObjectURL(recording.blobUrl);
-      setRecording(null);
-      setState(RecordingState.Recording);
-    }
   };
 
   const onUpload = async (metadata: RecordingMetadata) => {
@@ -273,8 +168,7 @@ export function NewRecordingScreen() {
     if (data) {
       // Upload ok
       addInfo("success", "Recording uploaded");
-      setState(RecordingState.Recording);
-      setStoredLanguage(metadata.language);
+      setState(RecordingState.Idle);
     } else {
       // Upload fail, error info provided by guard
       setState(RecordingState.Replay);
@@ -283,12 +177,15 @@ export function NewRecordingScreen() {
 
   const build_body = () => {
     switch (state) {
-      case RecordingState.Recording:
-        return <Recorder setRecording={onNewRecording} />;
+      case RecordingState.Idle:
+        return (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <DragDrop setRecording={onNewRecording} />
+          </div>
+        );
       case RecordingState.Replay:
         return (
           <Replay
-            storedLanguage={storedLanguage}
             recording={recording!}
             onDiscard={onDiscard}
             onUpload={onUpload}
@@ -300,7 +197,7 @@ export function NewRecordingScreen() {
   };
 
   return (
-    <LoggedScreenWrapper title="New recording">
+    <LoggedScreenWrapper title="Upload audio file">
       {build_body()}
     </LoggedScreenWrapper>
   );

@@ -9,6 +9,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import MicIcon from "@mui/icons-material/Mic";
+import UploadIcon from "@mui/icons-material/Upload";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HearingIcon from "@mui/icons-material/Hearing";
 import AudioFileIcon from "@mui/icons-material/AudioFile";
@@ -46,6 +47,14 @@ export function MainDrawer(props: {
                 <MicIcon />
               </ListItemIcon>
               <ListItemText primary="New recording" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding onClick={() => navigate("/upload")}>
+            <ListItemButton>
+              <ListItemIcon>
+                <UploadIcon />
+              </ListItemIcon>
+              <ListItemText primary="Upload audio file" />
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding onClick={() => navigate("/myrecordings")}>
