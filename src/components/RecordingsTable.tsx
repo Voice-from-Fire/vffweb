@@ -24,7 +24,7 @@ export function RecordingsTable(props: { data: Sample[] }) {
   return props.data.length === 0 ? (
     <Typography>No recordings</Typography>
   ) : (
-    <TableContainer>
+    <TableContainer style={{ width: "unset" }}>
       <Table sx={{ maxWidth: 400 }}>
         <TableHead>
           <TableRow>
