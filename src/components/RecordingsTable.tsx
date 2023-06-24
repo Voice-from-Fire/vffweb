@@ -11,13 +11,11 @@ import {
 import { Sample } from "../api/api";
 import { QuickPlayer } from "./QuickPlayer";
 import { LanguageDisplay } from "./LanguageDisplay";
+import { format } from "date-fns";
 
-function remove_subseconds(text: string): string {
-  const p = text.indexOf(".");
-  if (p === -1) {
-    return text;
-  }
-  return text.slice(0, p);
+function formatDate(text: string): string {
+  const date = new Date(text);
+  return format(date, "dd. MM. yyyy HH:mm");
 }
 
 export function RecordingsTable(props: { data: Sample[] }) {
@@ -41,7 +39,7 @@ export function RecordingsTable(props: { data: Sample[] }) {
               <TableCell align="right">
                 <Link href="#">{sample.id}</Link>
               </TableCell>
-              <TableCell>{remove_subseconds(sample.created_at!)}</TableCell>
+              <TableCell>{formatDate(sample.created_at!)}</TableCell>
               <TableCell>
                 <LanguageDisplay language={sample.language} />
               </TableCell>
