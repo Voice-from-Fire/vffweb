@@ -4,6 +4,7 @@ import { callGuard, createSamplesApi } from "../common/service";
 import { Sample } from "../api/api";
 import { LoadingWrapper } from "../components/LoadingWrapper";
 import { RecordingsTable } from "../components/RecordingsTable";
+import CenteredBox from "../components/CenteredBox";
 
 async function downloadMySamples(setData: (d: Sample[]) => void) {
   const api = createSamplesApi();
@@ -23,7 +24,9 @@ export function MyRecordingsScreen() {
   return (
     <LoggedScreenWrapper title="My recordings">
       <LoadingWrapper loaded={data !== null}>
-        <RecordingsTable data={data ? data : []} />
+        <CenteredBox>
+          <RecordingsTable data={data ? data : []} />
+        </CenteredBox>
       </LoadingWrapper>
     </LoggedScreenWrapper>
   );
