@@ -2117,7 +2117,7 @@ export const UsersApiFp = function (configuration?: Configuration) {
       userRoleUpdate: UserRoleUpdate,
       options?: AxiosRequestConfig
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.updateRoleUsersRoleUpdatePatch(
@@ -2269,7 +2269,7 @@ export const UsersApiFactory = function (
     updateRoleUsersRoleUpdatePatch(
       userRoleUpdate: UserRoleUpdate,
       options?: any
-    ): AxiosPromise<any> {
+    ): AxiosPromise<User> {
       return localVarFp
         .updateRoleUsersRoleUpdatePatch(userRoleUpdate, options)
         .then((request) => request(axios, basePath));
