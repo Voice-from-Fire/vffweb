@@ -17,3 +17,4 @@ mkdir api
 cd api
 
 java -jar ../../$GENERATOR generate -i http://localhost:8000/openapi.json -g typescript-axios
+npm run fmt
