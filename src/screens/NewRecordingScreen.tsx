@@ -69,7 +69,7 @@ async function getAudioInputDevices(): Promise<AudioInput[]> {
     .filter((device) => device.kind === "audioinput")
     .map((device, i) => ({
       deviceId: device.deviceId,
-      name: device.label.trim() || `Microphone ${i}`,
+      name: device.label.trim() || `Microphone ${i + 1}`,
     }));
 }
 
@@ -159,7 +159,10 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
     <Grid container direction="column" spacing="10">
       <Grid item>
         {hasAudioInputs && (
-          <FormControl variant="filled">
+          <FormControl
+            variant="filled"
+            style={{ minWidth: "200px", maxWidth: "300px" }}
+          >
             <InputLabel>Audio input</InputLabel>
             <Select
               disabled={service !== null}
@@ -180,7 +183,7 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
           </FormControl>
         )}
       </Grid>
-      <Grid item>
+      <Grid item style={{ margin: "15px" }}>
         {handler ? (
           <Fab
             sx={pauseFabStyle}
@@ -203,7 +206,7 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
           {
             /* eslint-disable */
             initing
-              ? "Initing"
+              ? "Initializing"
               : handler === null
               ? "Ready to record"
               : `Recording ... ${(time / 1000).toFixed(1)}s`
