@@ -1,8 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { LoggedScreenWrapper } from "../components/LoggedScreenWrapper";
 import { callGuard, createSamplesApi } from "../common/service";
 import { LoadingBar } from "../components/LoadingWrapper";
-import { Button, Fab, Grid, Typography } from "@mui/material";
+import {
+  Button,
+  Fab,
+  Grid,
+  Typography,
+  Select,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  SelectChangeEvent,
+} from "@mui/material";
 import MicIcon from "@mui/icons-material/Mic";
 import PauseIcon from "@mui/icons-material/Pause";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -11,11 +21,16 @@ import RecorderService from "../recorder/RecorderService";
 import { addInfo } from "../common/info";
 import axios from "axios";
 import { AudioPlayer } from "../components/AudioPlayer";
+import { Language } from "../api/api";
 
 type Recording = {
   blobUrl: string;
   mimeType: string;
   duration: number;
+};
+
+type RecordingMetadata = {
+  language: string;
 };
 
 enum RecordingState {
@@ -132,9 +147,11 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
 
 function Replay(props: {
   recording: Recording;
-  onUpload: () => void;
+  onUpload: (metadata: RecordingMetadata) => void;
   onDiscard: () => void;
 }) {
+  const [language, setLanguage] = React.useState<string>("en");
+
   return (
     <Grid container direction="column" spacing="10">
       <Grid item>
@@ -144,10 +161,27 @@ function Replay(props: {
         />
       </Grid>
 
+      <Grid mt="10px">
+        <FormControl variant="filled">
+          <InputLabel>Language</InputLabel>
+          <Select
+            label="Language"
+            value={language}
+            onChange={(event: SelectChangeEvent) =>
+              setLanguage(event.target.value)
+            }
+          >
+            <MenuItem value={Language.Cs}>Czech</MenuItem>
+            <MenuItem value={Language.En}>English</MenuItem>
+            <MenuItem value={Language.Nv}>Nonverbal</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+
       <Grid item>
         <Button
           variant="contained"
-          onClick={props.onUpload}
+          onClick={() => props.onUpload({ language })}
           sx={{ width: 145, margin: 0.5 }}
         >
           <UploadIcon sx={{ margin: 1.5 }} />
@@ -204,7 +238,7 @@ export function NewRecordingScreen() {
     }
   };
 
-  const onUpload = async () => {
+  const onUpload = async (metadata: RecordingMetadata) => {
     const api = createSamplesApi();
     const result = await axios({
       url: recording?.blobUrl,
@@ -216,7 +250,7 @@ export function NewRecordingScreen() {
     setState(RecordingState.Uploading);
 
     const data = await callGuard(async () => {
-      return await api.uploadSampleSamplesPost("en", file);
+      return await api.uploadSampleSamplesPost(metadata.language, file);
     });
 
     if (data) {
@@ -249,12 +283,6 @@ export function NewRecordingScreen() {
   return (
     <LoggedScreenWrapper title="New recording">
       {build_body()}
-      {/* <Stack>
-            <IconButton>
-                <MicIcon style={iconStyle} />
-            </IconButton>
-            <Typography>Read to record</Typography>
-        </Stack> */}
     </LoggedScreenWrapper>
   );
 }
