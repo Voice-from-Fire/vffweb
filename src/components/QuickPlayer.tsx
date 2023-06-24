@@ -6,11 +6,11 @@ import { useState } from "react";
 import { audioUrl } from "../common/audio";
 
 export function QuickPlayer(props: { sample: Sample }) {
-  const [startTime, setStartTime] = useState<number | null>(null);
+  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
   const start = () => {
-    setStartTime(10);
+    setAudioPlaying(true);
 
     const audio = new Audio();
     const source = document.createElement("source");
@@ -18,21 +18,22 @@ export function QuickPlayer(props: { sample: Sample }) {
     // TODO FIX FOR Safari
     audio.append(source);
     setAudio(audio);
+    audio.addEventListener("ended", () => setAudioPlaying(false));
     audio.play();
   };
 
   const stop = () => {
-    setStartTime(null);
+    setAudioPlaying(false);
     audio?.pause();
   };
 
   return (
     <IconButton
       onClick={() => {
-        startTime === null ? start() : stop();
+        audioPlaying ? stop() : start();
       }}
     >
-      {startTime === null ? <PlayCircleIcon /> : <PauseCircleIcon />}
+      {audioPlaying ? <PauseCircleIcon /> : <PlayCircleIcon />}
     </IconButton>
   );
 }
