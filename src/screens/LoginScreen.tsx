@@ -132,7 +132,8 @@ export function LoginScreen() {
             <Button
               onClick={() => navigate("/new")}
               fullWidth
-              variant="outlined"
+              variant="text"
+              color="secondary"
               sx={{ mt: 3, mb: 2 }}
             >
               Create new account

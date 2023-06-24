@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Snackbar, ThemeProvider, createTheme } from "@mui/material";
 import { LoginScreen } from "./screens/LoginScreen";
 import { useRecoilState } from "recoil";
 import { infoState } from "./common/info";
@@ -89,12 +89,24 @@ function App() {
 
   const router = createBrowserRouter(paths);
 
+  const theme = createTheme({
+    palette: {
+      mode: "light",
+      primary: {
+        main: "#5599ff",
+      },
+      secondary: {
+        main: "#ff56dd",
+      },
+    },
+  });
+
   const onErrorClose = () => {
     setInfo(info.slice(1));
   };
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <RouterProvider router={router} />
       <Snackbar
         open={info.length > 0}
@@ -112,7 +124,7 @@ function App() {
           </Alert>
         ) : undefined}
       </Snackbar>
-    </>
+    </ThemeProvider>
   );
 }
 
