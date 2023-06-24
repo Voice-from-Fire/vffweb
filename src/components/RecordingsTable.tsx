@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { Sample } from "../api/api";
 import { QuickPlayer } from "./QuickPlayer";
+import { LanguageDisplay } from "./LanguageDisplay";
 
 function remove_subseconds(text: string): string {
   const p = text.indexOf(".");
@@ -29,6 +30,7 @@ export function RecordingsTable(props: { data: Sample[] }) {
           <TableRow>
             <TableCell align="right">Id</TableCell>
             <TableCell>Date</TableCell>
+            <TableCell>Language</TableCell>
             <TableCell>Time</TableCell>
             <TableCell></TableCell>
           </TableRow>
@@ -40,6 +42,9 @@ export function RecordingsTable(props: { data: Sample[] }) {
                 <Link href="#">{sample.id}</Link>
               </TableCell>
               <TableCell>{remove_subseconds(sample.created_at!)}</TableCell>
+              <TableCell>
+                <LanguageDisplay language={sample.language} />
+              </TableCell>
               <TableCell>{sample.duration.toFixed(1)}s</TableCell>
               <TableCell>
                 <QuickPlayer sample={sample} />
