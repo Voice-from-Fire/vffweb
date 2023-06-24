@@ -32,7 +32,10 @@ export function UserRecordingsScreen() {
   }, [userId]);
 
   return (
-    <LoggedScreenWrapper title={"recordings of user #" + userId}>
+    <LoggedScreenWrapper
+      title={"recordings of user #" + userId}
+      parentRoute="/users"
+    >
       <LoadingWrapper loaded={data !== null}>
         <RecordingsTable data={data ? data : []} />
       </LoadingWrapper>
