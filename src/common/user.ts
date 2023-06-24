@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import { atom, useRecoilValue } from "recoil";
 import { getRecoil, setRecoil } from "recoil-nexus";
 
-const LOGGED_USER: string = "loggedUser";
+const LOGGED_USER = "loggedUser";
 
 export type LoggedUser = {
   name: string;

@@ -6,7 +6,7 @@ import axios, { AxiosError } from "axios";
 import { BASEPATH } from "../config";
 
 function createConfig(): Configuration {
-  var accessToken = getLoggedUser()?.token;
+  const accessToken = getLoggedUser()?.token;
   return new Configuration({
     basePath: BASEPATH,
     accessToken,

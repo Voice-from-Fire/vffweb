@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-anonymous-default-export
 export default function () {
   // Parts copied from https://github.com/chris-rudmin/Recorderjs
   let BYTES_PER_SAMPLE = 2;

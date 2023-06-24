@@ -22,7 +22,7 @@ function App() {
   const [info, setInfo] = useRecoilState(infoState);
   const user = useLoggedUser();
 
-  var paths;
+  let paths;
   if (user === null) {
     paths = [
       {

@@ -17,19 +17,19 @@ async function createAccount(
   password: string,
   email: string
 ): Promise<boolean> {
-  let api = createUsersApi();
-  let customErrors = new Map();
+  const api = createUsersApi();
+  const customErrors = new Map();
   customErrors.set(401, "Invalid invitation code");
   customErrors.set(409, "User already exists");
 
-  let userCreate = {
+  const userCreate = {
     name,
     invitation_code: code,
     password,
     email: email.length > 1 ? email : undefined,
   };
 
-  let r = await callGuard(
+  const r = await callGuard(
     async () => await api.createUserUsersPost(userCreate),
     customErrors
   );
@@ -59,7 +59,7 @@ export function CreateUserScreen() {
     const password2 = data.get("password2")?.toString()!;
     const email = data.get("email")?.toString()!;
 
-    let e: Err = {};
+    const e: Err = {};
 
     if (username.length < 3) {
       e.name = "Username needs at least 3 characters";

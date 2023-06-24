@@ -58,10 +58,10 @@ const iconStyle = {
 };
 
 function Recorder(props: { setRecording: (r: Recording) => void }) {
-  let [service, setService] = useState<RecorderService | null>(null);
-  let [handler, setHandler] = useState<NodeJS.Timer | null>(null);
+  const [service, setService] = useState<RecorderService | null>(null);
+  const [handler, setHandler] = useState<NodeJS.Timer | null>(null);
   //let [startTime, setStartTime] = useState<number>(0);
-  let [time, setTime] = useState<number>(0);
+  const [time, setTime] = useState<number>(0);
 
   useEffect(
     () => () => {
@@ -99,7 +99,8 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
           clearInterval(handler);
           setHandler(null);
           const endTime = new Date().getTime();
-          let event = evt as any;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const event = evt as any;
           console.log(event);
           props.setRecording({
             blobUrl: event.detail.recording.blobUrl,
@@ -135,11 +136,15 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
       </Grid>
       <Grid item>
         <Typography>
-          {initing
-            ? "Initing"
-            : handler === null
-            ? "Ready to record"
-            : `Recording ... ${(time / 1000).toFixed(1)}s`}
+          {
+            /* eslint-disable */
+            initing
+              ? "Initing"
+              : handler === null
+              ? "Ready to record"
+              : `Recording ... ${(time / 1000).toFixed(1)}s`
+            /* eslint-enable */
+          }
         </Typography>
       </Grid>
     </Grid>
@@ -215,8 +220,8 @@ function Replay(props: {
 }
 
 export function NewRecordingScreen() {
-  let [state, setState] = useState<RecordingState>(RecordingState.Recording);
-  let [recording, setRecording] = useState<Recording | null>(null);
+  const [state, setState] = useState<RecordingState>(RecordingState.Recording);
+  const [recording, setRecording] = useState<Recording | null>(null);
 
   useEffect(
     () => () => {
