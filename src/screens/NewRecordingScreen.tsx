@@ -169,6 +169,7 @@ function Recorder(props: {
   // Compute desired radius of the indicator circle
   const mean_fft = Math.max(1.0, mean(fftBuffer ?? [0]));
   const volume_radius = Math.max(0.0, (Math.log2(mean_fft) - 5) / 3) * 45;
+  console.log([mean_fft, volume_radius]);
 
   const hasAudioInputs = availableAudioInputs.length > 0 && audioInput !== null;
   return (
