@@ -5,8 +5,9 @@ import { DataGrid } from "@mui/x-data-grid";
 import { GridColDef } from "@mui/x-data-grid/models/colDef/gridColDef";
 import { LanguageDisplay } from "./LanguageDisplay";
 import { QuickPlayer } from "./QuickPlayer";
+import { Link } from "react-router-dom";
 
-function formatDate(text: string): string {
+export function formatDate(text: string): string {
   const date = new Date(text);
   return format(date, "dd. MM. yyyy HH:mm");
 }
@@ -21,7 +22,14 @@ type Row = {
 
 export function RecordingsTable(props: { data: Sample[] }) {
   const columns: GridColDef<Row>[] = [
-    { field: "id", headerName: "ID", width: 90 },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 90,
+      renderCell: (params) => (
+        <Link to={`/recording/${params.value}`}>{params.value}</Link>
+      ),
+    },
     { field: "date", headerName: "Date", width: 150 },
     {
       field: "language",

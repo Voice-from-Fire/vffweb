@@ -19,6 +19,7 @@ import { UserDetailScreen } from "./screens/UserDetailScreen";
 import { FeedbackScreen } from "./screens/FeedbackScreen";
 import { NotFoundScreen } from "./screens/NotFoundScreen";
 import { hasRequiredRole } from "./common/user";
+import { RecordingDetailScreen } from "./screens/RecordingDetailScreen";
 
 //import RecorderService from './recorder/RecorderService';
 
@@ -55,6 +56,10 @@ function App() {
       {
         path: "/myrecordings",
         element: <MyRecordingsScreen />,
+      },
+      {
+        path: "/recording/:sampleId",
+        element: <RecordingDetailScreen />,
       },
       {
         path: "/new",
