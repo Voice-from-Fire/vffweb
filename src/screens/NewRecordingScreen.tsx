@@ -156,13 +156,10 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
 
   const hasAudioInputs = availableAudioInputs.length > 0 && audioInput !== null;
   return (
-    <Grid container direction="column" spacing="10">
+    <Grid container direction="column" spacing="20" pt={2}>
       <Grid item>
         {hasAudioInputs && (
-          <FormControl
-            variant="filled"
-            style={{ minWidth: "200px", maxWidth: "300px" }}
-          >
+          <FormControl variant="filled" style={{ width: 300 }}>
             <InputLabel>Audio input</InputLabel>
             <Select
               disabled={service !== null}
@@ -183,7 +180,7 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
           </FormControl>
         )}
       </Grid>
-      <Grid item style={{ margin: "15px" }}>
+      <Grid item style={{ margin: "25px" }}>
         {handler ? (
           <Fab
             sx={pauseFabStyle}
@@ -226,16 +223,18 @@ function Replay(props: {
 }) {
   const [language, setLanguage] = useState<string>(props.storedLanguage);
   return (
-    <Grid container direction="column" spacing="10">
+    <Grid container direction="column" spacing="20" pt={2}>
       <Grid item>
-        <AudioPlayer
-          url={props.recording.blobUrl}
-          mimeType={props.recording.mimeType}
-        />
+        <span style={{ width: 295 }}>
+          <AudioPlayer
+            url={props.recording.blobUrl}
+            mimeType={props.recording.mimeType}
+          />
+        </span>
       </Grid>
 
-      <Grid mt="10px">
-        <FormControl variant="filled">
+      <Grid item>
+        <FormControl variant="filled" style={{ width: 300 }}>
           <InputLabel>Language</InputLabel>
           <Select
             label="Language"
