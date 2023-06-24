@@ -1,56 +1,64 @@
-import {
-  Link,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Typography } from "@mui/material";
 import { Sample } from "../api/api";
-import { QuickPlayer } from "./QuickPlayer";
-import { LanguageDisplay } from "./LanguageDisplay";
 import { format } from "date-fns";
+import { DataGrid } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid/models/colDef/gridColDef";
+import { LanguageDisplay } from "./LanguageDisplay";
+import { QuickPlayer } from "./QuickPlayer";
 
 function formatDate(text: string): string {
   const date = new Date(text);
   return format(date, "dd. MM. yyyy HH:mm");
 }
 
+type Row = {
+  id: number;
+  date: string;
+  language: string;
+  duration: string;
+  audio: Sample;
+};
+
 export function RecordingsTable(props: { data: Sample[] }) {
+  const columns: GridColDef<Row>[] = [
+    { field: "id", headerName: "ID", width: 90 },
+    { field: "date", headerName: "Date", width: 150 },
+    {
+      field: "language",
+      headerName: "Language",
+      width: 90,
+      renderCell: (params) => <LanguageDisplay language={params.value} />,
+    },
+    { field: "duration", headerName: "Duration", width: 90 },
+    {
+      field: "audio",
+      headerName: "Play",
+      width: 90,
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (params) => <QuickPlayer sample={params.value} />,
+    },
+  ];
+  const rows: Row[] = props.data.map((sample) => ({
+    id: sample.id,
+    date: formatDate(sample.created_at!),
+    language: sample.language,
+    duration: `${sample.duration.toFixed(1)}s`,
+    audio: sample,
+  }));
+
   return props.data.length === 0 ? (
     <Typography>No recordings</Typography>
   ) : (
-    <TableContainer>
-      <Table sx={{ maxWidth: 400 }}>
-        <TableHead>
-          <TableRow>
-            <TableCell align="right">Id</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell>Language</TableCell>
-            <TableCell>Time</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {props.data.map((sample) => (
-            <TableRow key={sample.id}>
-              <TableCell align="right">
-                <Link href="#">{sample.id}</Link>
-              </TableCell>
-              <TableCell>{formatDate(sample.created_at!)}</TableCell>
-              <TableCell>
-                <LanguageDisplay language={sample.language} />
-              </TableCell>
-              <TableCell>{sample.duration.toFixed(1)}s</TableCell>
-              <TableCell>
-                <QuickPlayer sample={sample} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <DataGrid
+      rows={rows}
+      columns={columns}
+      initialState={{
+        sorting: {
+          sortModel: [{ field: "id", sort: "desc" }],
+        },
+      }}
+      rowSelection={false}
+    ></DataGrid>
   );
 }
