@@ -1,5 +1,5 @@
 import { IconButton } from "@mui/material";
-import { Sample } from "../api";
+import { Sample } from "../api/api";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 import { useState } from "react";
