@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -19,6 +18,7 @@ import {
 import { AudioPlayer } from "../components/AudioPlayer";
 import { LoadingWrapper } from "../components/LoadingWrapper";
 import { LoggedScreenWrapper } from "../components/LoggedScreenWrapper";
+import { SuccessButton } from "../components/SuccessButton";
 
 enum Status {
   Loading,
@@ -71,8 +71,10 @@ export function FeedbackScreen() {
     sample: null,
   });
   const [audioStatus, setAudioStatus] = useState<AudioStatus>(AudioStatus.Ok);
-  const [genderSliderValue, setGenderSliderValue] = useState<number>(0);
-  const [naturalSliderValue, setNaturalSliderValue] = useState<number>(1);
+  const [genderSliderValue, setGenderSliderValue] = useState<number>(3);
+  const [naturalSliderValue, setNaturalSliderValue] = useState<number>(2);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
 
   useEffect(() => {
     getNextSample(setState);
@@ -80,6 +82,7 @@ export function FeedbackScreen() {
 
   const handleStateChange = (event: SelectChangeEvent<AudioStatus>) => {
     setAudioStatus(event.target.value as AudioStatus);
+    setSuccess(false);
   };
 
   const handleGenderSliderChange = (
@@ -87,6 +90,7 @@ export function FeedbackScreen() {
     newValue: number | number[]
   ) => {
     setGenderSliderValue(newValue as number);
+    setSuccess(false);
   };
 
   const handleNaturalSliderChange = (
@@ -94,9 +98,18 @@ export function FeedbackScreen() {
     newValue: number | number[]
   ) => {
     setNaturalSliderValue(newValue as number);
+    setSuccess(false);
+  };
+
+  const resetForm = () => {
+    setAudioStatus(AudioStatus.Ok);
+    setGenderSliderValue(3);
+    setNaturalSliderValue(2);
   };
 
   const handleSubmit = async () => {
+    setUploading(true);
+    setSuccess(false);
     const labelCreate = {
       status: audioStatus,
       values: [
@@ -111,6 +124,9 @@ export function FeedbackScreen() {
       ],
     };
     await submitLabel(state!.sample!.id, labelCreate);
+    resetForm();
+    setUploading(false);
+    setSuccess(true);
     getNextSample(setState);
   };
 
@@ -125,8 +141,7 @@ export function FeedbackScreen() {
             style={{
               display: "flex",
               flexDirection: "column",
-
-              gap: 20,
+              gap: 40,
               maxWidth: 400,
               margin: "0 auto",
             }}
@@ -139,6 +154,7 @@ export function FeedbackScreen() {
               <InputLabel id="state-select-label">State</InputLabel>
               <Select
                 labelId="state-select-label"
+                label="State"
                 id="state-select"
                 value={audioStatus}
                 onChange={handleStateChange}
@@ -153,7 +169,7 @@ export function FeedbackScreen() {
 
             {audioStatus === AudioStatus.Ok && (
               <>
-                <Box>
+                <FormControl>
                   <InputLabel id="gender-slider-label">Gender</InputLabel>
                   <Slider
                     id="gender-slider"
@@ -166,8 +182,8 @@ export function FeedbackScreen() {
                     valueLabelFormat={(value) => genderLabels[value]}
                     marks
                   />
-                </Box>
-                <Box>
+                </FormControl>
+                <FormControl>
                   <InputLabel id="natural-slider-label">Natural</InputLabel>
                   <Slider
                     id="natural-slider"
@@ -180,12 +196,17 @@ export function FeedbackScreen() {
                     valueLabelFormat={(value) => naturalLabels[value]}
                     marks
                   />
-                </Box>
+                </FormControl>
               </>
             )}
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
+            <SuccessButton
+              success={success}
+              loading={uploading}
+              color="primary"
+              handleButtonClick={handleSubmit}
+            >
               Save & Next
-            </Button>
+            </SuccessButton>
           </Box>
         )}
       </LoadingWrapper>
