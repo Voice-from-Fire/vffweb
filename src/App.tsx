@@ -15,8 +15,8 @@ import { NewRecordingScreen } from "./screens/NewRecordingScreen";
 import { UploadAudioFileScreen } from "./screens/UploadAudioFileScreen";
 import { UsersScreen } from "./screens/UsersScreen";
 import { CreateUserScreen } from "./screens/CreateUserScreen";
-import { FeedbackScreen } from "./screens/FeedbackSceen";
 import { UserDetailScreen } from "./screens/UserDetailScreen";
+import { FeedbackScreen } from "./screens/FeedbackScreen";
 import { NotFoundScreen } from "./screens/NotFoundScreen";
 import { hasRequiredRole } from "./common/user";
 
