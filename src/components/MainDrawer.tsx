@@ -13,7 +13,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import HearingIcon from "@mui/icons-material/Hearing";
 import AudioFileIcon from "@mui/icons-material/AudioFile";
 import PeopleIcon from "@mui/icons-material/People";
-import { setLoggedUser, useLoggedUser } from "../common/user";
+import { setLoggedUser, useLoggedUser, hasRequiredRole } from "../common/user";
 import { useNavigate } from "react-router";
 
 export function MainDrawer(props: {
@@ -56,23 +56,27 @@ export function MainDrawer(props: {
               <ListItemText primary="My recordings" />
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding onClick={() => navigate("/feedback")}>
-            <ListItemButton>
-              <ListItemIcon>
-                <HearingIcon />
-              </ListItemIcon>
-              <ListItemText primary="Give feedback" />
-            </ListItemButton>
-          </ListItem>
+          {hasRequiredRole("reviewer") && (
+            <ListItem disablePadding onClick={() => navigate("/feedback")}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <HearingIcon />
+                </ListItemIcon>
+                <ListItemText primary="Give feedback" />
+              </ListItemButton>
+            </ListItem>
+          )}
           <Divider />
-          <ListItem disablePadding onClick={() => navigate("/users")}>
-            <ListItemButton>
-              <ListItemIcon>
-                <PeopleIcon />
-              </ListItemIcon>
-              <ListItemText primary="Users" />
-            </ListItemButton>
-          </ListItem>
+          {hasRequiredRole("admin") && (
+            <ListItem disablePadding onClick={() => navigate("/users")}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <PeopleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Users" />
+              </ListItemButton>
+            </ListItem>
+          )}
           <Divider />
           <ListItem disablePadding onClick={() => setLoggedUser(null)}>
             <ListItemButton>

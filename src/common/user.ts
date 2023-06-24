@@ -4,6 +4,13 @@ import { getRecoil, setRecoil } from "recoil-nexus";
 
 const LOGGED_USER: string = "loggedUser";
 
+const ROLES: { [role: string]: number } = {
+  user: 0,
+  reviewer: 1,
+  moderator: 2,
+  admin: 3,
+};
+
 export type LoggedUser = {
   name: string;
   token: string;
@@ -28,4 +35,13 @@ export function useLoggedUser(): LoggedUser | null {
 
 export function getLoggedUser(): LoggedUser | null {
   return getRecoil(loggedUser);
+}
+
+export function hasRequiredRole(role: string) {
+  const user = getLoggedUser();
+  if (!user) {
+    return false;
+  }
+
+  return ROLES[user.role] >= ROLES[role];
 }
