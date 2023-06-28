@@ -20,6 +20,7 @@ import { FeedbackScreen } from "./screens/FeedbackScreen";
 import { NotFoundScreen } from "./screens/NotFoundScreen";
 import { hasRequiredRole } from "./common/user";
 import { RecordingDetailScreen } from "./screens/RecordingDetailScreen";
+import { vff_blue, vff_pink } from "./common/colors.const";
 
 //import RecorderService from './recorder/RecorderService';
 
@@ -98,10 +99,10 @@ function App() {
     palette: {
       mode: "light",
       primary: {
-        main: "#5599ff",
+        main: vff_blue,
       },
       secondary: {
-        main: "#ff56dd",
+        main: vff_pink,
       },
     },
   });
