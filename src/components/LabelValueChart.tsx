@@ -25,6 +25,8 @@ const LabelValueChart = ({
   labels,
   getColor,
 }: LabelValueChartProps) => {
+  const width = Math.min(window.innerWidth, 500);
+
   const renderCustomAxisTick = ({
     x,
     y,
@@ -73,9 +75,11 @@ const LabelValueChart = ({
 
   return (
     <>
-      <Typography variant="h6">{title}</Typography>
+      <Typography variant="h6">
+        {title} - {width}
+      </Typography>
       <BarChart
-        width={500}
+        width={width}
         height={300}
         data={counts}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
