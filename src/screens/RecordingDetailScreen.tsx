@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -17,6 +17,7 @@ import { formatDate } from "../components/RecordingsTable";
 import { vff_blue, vff_pink } from "../common/colors.const";
 import { genderLabels, naturalLabels } from "../common/labels.const";
 import LabelCounts from "../components/LabelCounts";
+import DeleteButton from "../components/DeleteButton";
 
 async function downloadSample(sampleId: number): Promise<Sample | null> {
   const api = createSamplesApi();
@@ -106,10 +107,10 @@ function SampleDetail({
   return (
     <Grid container direction="column" alignItems="center" gap={2}>
       <Typography>{formatDate(sample.created_at!)}</Typography>
-      <AudioPlayer url={audioUrl(sample)} mimeType={""}></AudioPlayer>
-      <Button variant="contained" color="error" onClick={onDelete}>
-        Delete
-      </Button>
+      <Grid container direction="row" gap={2} justifyContent="center">
+        <AudioPlayer url={audioUrl(sample)} mimeType={""}></AudioPlayer>
+        <DeleteButton onDelete={onDelete} />
+      </Grid>
 
       <LabelCounts statusCounts={statusCounts} />
 
