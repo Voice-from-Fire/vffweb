@@ -1,13 +1,14 @@
 import { Box, Button, ButtonProps, CircularProgress } from "@mui/material";
 import { green } from "@mui/material/colors";
 
-export function SuccessButton(props: {
-  children: React.ReactNode;
-  color: ButtonProps["color"];
-  success: boolean;
-  loading: boolean;
-  handleButtonClick: () => void;
-}) {
+export function SuccessButton(
+  props: {
+    children: React.ReactNode;
+    success?: boolean;
+    loading: boolean;
+    handleButtonClick?: () => void;
+  } & ButtonProps
+) {
   const buttonSx = {
     ...(props.success && {
       bgcolor: green[500],
@@ -18,10 +19,10 @@ export function SuccessButton(props: {
   };
 
   return (
-    <Box sx={{ m: 1, position: "relative" }}>
+    <Box sx={{ mv: 1, position: "relative" }}>
       <Button
+        {...props}
         variant="contained"
-        color={props.color}
         sx={buttonSx}
         disabled={props.loading}
         onClick={props.handleButtonClick}
