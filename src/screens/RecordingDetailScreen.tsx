@@ -163,7 +163,10 @@ export function RecordingDetailScreen() {
   };
 
   return (
-    <LoggedScreenWrapper title={`Recording ${sampleId} detail`}>
+    <LoggedScreenWrapper
+      title={`Recording ${sampleId} detail`}
+      parentRoute="/myrecordings"
+    >
       {sample === null ? (
         "Loading"
       ) : (
