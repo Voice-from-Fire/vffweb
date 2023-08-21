@@ -1,10 +1,11 @@
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import logo from "../assets/images/logo.png";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { callGuard, createUsersApi } from "../common/service";
 import { NavigateFunction, useLocation, useNavigate } from "react-router";
 import { setLoggedUser } from "../common/user";
 import { autoLoginEnabled, autoLoginName, autoLoginPassword } from "../config";
+import { SuccessButton } from "../components/SuccessButton";
 
 async function doLogin(
   navigate: NavigateFunction,
@@ -44,7 +45,6 @@ async function doLogin(
     role: r.data["user"]["role"],
     token: r.data["access_token"],
   };
-  console.log(user);
   setLoggedUser(user);
   navigate(location);
 }
@@ -52,8 +52,9 @@ async function doLogin(
 export function LoginScreen() {
   const navigate = useNavigate();
   const location = useLocation().pathname;
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (event: {
+  const handleLogin = async (event: {
     preventDefault: () => void;
     currentTarget: HTMLFormElement | undefined;
   }) => {
@@ -64,12 +65,15 @@ export function LoginScreen() {
     if (password.length === 0 || username.length === 0) {
       return;
     }
+    setLoading(true);
     if (username != null && password != null) {
-      doLogin(navigate, location, username, password);
+      await doLogin(navigate, location, username, password);
+      setLoading(false);
     }
   };
   useEffect(() => {
     if (autoLoginEnabled) {
+      setLoading(true);
       doLogin(navigate, location, autoLoginName, autoLoginPassword);
     }
   }, [location, navigate]);
@@ -85,13 +89,7 @@ export function LoginScreen() {
           }}
         >
           <img src={logo} alt="logo" width="200" style={{ padding: 10 }} />
-          <Typography
-            component="h1"
-            variant="h3"
-            style={{ paddingTop: 30, paddingBottom: 30 }}
-          >
-            Voice From Fire
-          </Typography>
+
           <Box
             component="form"
             onSubmit={handleLogin}
@@ -121,14 +119,15 @@ export function LoginScreen() {
               variant="standard"
               defaultValue=""
             />
-            <Button
-              type="submit"
+            <SuccessButton
               fullWidth
-              variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              loading={loading}
+              color="primary"
+              type="submit"
             >
               Login
-            </Button>
+            </SuccessButton>
             <Button
               onClick={() => navigate("/new")}
               fullWidth
@@ -144,3 +143,10 @@ export function LoginScreen() {
     </Box>
   );
 }
+<Typography
+  component="h1"
+  variant="h3"
+  style={{ paddingTop: 30, paddingBottom: 30 }}
+>
+  Voice From Fire
+</Typography>;
