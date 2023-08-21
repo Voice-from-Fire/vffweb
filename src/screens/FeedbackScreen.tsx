@@ -10,7 +10,7 @@ import {
   Slider,
   Typography,
 } from "@mui/material";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AudioStatus, LabelCreate, LabelType, Sample } from "../api/api";
 import { audioUrl } from "../common/audio";
 import {
@@ -39,22 +39,7 @@ enum SlideDirection {
 type FeedbackState = {
   status: Status;
   sample: Sample | null;
-  slideDirection: SlideDirection;
 };
-
-async function getNextSample(
-  setState: Dispatch<SetStateAction<FeedbackState>>
-) {
-  const api = createSamplesApi();
-  await callGuard(async () => {
-    const result = await api.getNextSampleForLabellingSamplesNextGet();
-    setState({
-      status: Status.Loaded,
-      sample: result.data,
-      slideDirection: SlideDirection.Out,
-    });
-  });
-}
 
 async function submitLabel(sampleId: number, labelCreate: LabelCreate) {
   const api = createLabelsApi();
@@ -67,40 +52,55 @@ export function FeedbackScreen() {
   const [state, setState] = useState<FeedbackState>({
     status: Status.Loading,
     sample: null,
-    slideDirection: SlideDirection.In,
   });
   const [audioStatus, setAudioStatus] = useState<AudioStatus>(AudioStatus.Ok);
   const [genderSliderValue, setGenderSliderValue] = useState<number>(3);
   const [naturalSliderValue, setNaturalSliderValue] = useState<number>(2);
   const [uploading, setUploading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
+  const [slideDirection, setSlideDirection] = useState<SlideDirection>(
+    SlideDirection.In
+  );
 
-  useEffect(() => {
-    getNextSample(setState);
+  const getNextSample = useCallback(async () => {
+    const api = createSamplesApi();
+    setState({
+      status: Status.Loading,
+      sample: null,
+    });
+    await callGuard(async () => {
+      const result = await api.getNextSampleForLabellingSamplesNextGet();
+      setState({
+        status: Status.Loaded,
+        sample: result.data,
+      });
+      setSlideDirection(SlideDirection.Out);
+      setSuccess(false);
+    });
   }, []);
 
   useEffect(() => {
-    if (state.slideDirection === SlideDirection.Out) {
+    getNextSample();
+  }, []);
+
+  useEffect(() => {
+    if (slideDirection === SlideDirection.Out) {
       const timer = setTimeout(() => {
-        getNextSample(setState);
-      }, ANIMATION_DURATION); // Wait for 1s, which is the duration of the slide-out animation
+        getNextSample();
+      }, 2 * ANIMATION_DURATION); // Wait for 1s, which is the duration of the slide-out animation
 
       return () => clearTimeout(timer);
     }
-  }, [state.slideDirection]);
+  }, [slideDirection]);
 
   useEffect(() => {
     if (state.status === Status.Loaded && state.sample) {
-      setState((prevState) => ({
-        ...prevState,
-        slideDirection: SlideDirection.In,
-      }));
+      setSlideDirection(SlideDirection.In);
     }
   }, [state.status, state.sample]);
 
   const handleStateChange = (event: SelectChangeEvent<AudioStatus>) => {
     setAudioStatus(event.target.value as AudioStatus);
-    setSuccess(false);
   };
 
   const handleGenderSliderChange = (
@@ -108,7 +108,6 @@ export function FeedbackScreen() {
     newValue: number | number[]
   ) => {
     setGenderSliderValue(newValue as number);
-    setSuccess(false);
   };
 
   const handleNaturalSliderChange = (
@@ -116,7 +115,6 @@ export function FeedbackScreen() {
     newValue: number | number[]
   ) => {
     setNaturalSliderValue(newValue as number);
-    setSuccess(false);
   };
 
   const resetForm = () => {
@@ -145,16 +143,12 @@ export function FeedbackScreen() {
     resetForm();
     setUploading(false);
     setSuccess(true);
-    getNextSample(setState);
-    setState((prevState) => ({
-      ...prevState,
-      slideDirection: SlideDirection.Out,
-    }));
+    setSlideDirection(SlideDirection.Out);
   };
 
   const slideProps: Partial<SlideProps & { key?: number }> = {
-    direction: state.slideDirection === SlideDirection.In ? "left" : "right",
-    in: state.slideDirection === SlideDirection.In,
+    direction: slideDirection === SlideDirection.In ? "left" : "right",
+    in: slideDirection === SlideDirection.In,
     key: state.sample?.id,
     timeout: { enter: ANIMATION_DURATION, exit: ANIMATION_DURATION },
     mountOnEnter: true,
