@@ -34,25 +34,6 @@ import type { RequestArgs } from "./base";
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from "./base";
 
 /**
- *
- * @export
- * @interface AudioFile
- */
-export interface AudioFile {
-  /**
-   *
-   * @type {string}
-   * @memberof AudioFile
-   */
-  path: string;
-  /**
-   *
-   * @type {string}
-   * @memberof AudioFile
-   */
-  format: string;
-}
-/**
  * An enumeration.
  * @export
  * @enum {string}
@@ -249,10 +230,16 @@ export interface Sample {
   owner?: number;
   /**
    *
-   * @type {Array<AudioFile>}
+   * @type {number}
    * @memberof Sample
    */
-  audio_files: Array<AudioFile>;
+  size: number;
+  /**
+   *
+   * @type {string}
+   * @memberof Sample
+   */
+  filename: string;
 }
 
 /**
@@ -406,20 +393,24 @@ export const AudioApiAxiosParamCreator = function (
   return {
     /**
      *
-     * @summary Get Audio
-     * @param {string} filename
+     * @summary Get Mp3 Audio
+     * @param {number} sampleId
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getAudioAudioFilesFilenameGet: async (
-      filename: string,
+    getMp3AudioSampleSampleIdMp3Get: async (
+      sampleId: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      // verify required parameter 'filename' is not null or undefined
-      assertParamExists("getAudioAudioFilesFilenameGet", "filename", filename);
-      const localVarPath = `/audio_files/{filename}`.replace(
-        `{${"filename"}}`,
-        encodeURIComponent(String(filename))
+      // verify required parameter 'sampleId' is not null or undefined
+      assertParamExists(
+        "getMp3AudioSampleSampleIdMp3Get",
+        "sampleId",
+        sampleId
+      );
+      const localVarPath = `/sample/{sample_id}/mp3`.replace(
+        `{${"sample_id"}}`,
+        encodeURIComponent(String(sampleId))
       );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -436,14 +427,55 @@ export const AudioApiAxiosParamCreator = function (
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      // authentication LoginManager required
-      // oauth required
-      await setOAuthToObject(
-        localVarHeaderParameter,
-        "LoginManager",
-        [],
-        configuration
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @summary Get Original Audio
+     * @param {number} sampleId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getOriginalAudioSampleSampleIdAudioGet: async (
+      sampleId: number,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'sampleId' is not null or undefined
+      assertParamExists(
+        "getOriginalAudioSampleSampleIdAudioGet",
+        "sampleId",
+        sampleId
       );
+      const localVarPath = `/sample/{sample_id}/audio`.replace(
+        `{${"sample_id"}}`,
+        encodeURIComponent(String(sampleId))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions =
@@ -471,20 +503,45 @@ export const AudioApiFp = function (configuration?: Configuration) {
   return {
     /**
      *
-     * @summary Get Audio
-     * @param {string} filename
+     * @summary Get Mp3 Audio
+     * @param {number} sampleId
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async getAudioAudioFilesFilenameGet(
-      filename: string,
+    async getMp3AudioSampleSampleIdMp3Get(
+      sampleId: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.getAudioAudioFilesFilenameGet(
-          filename,
+        await localVarAxiosParamCreator.getMp3AudioSampleSampleIdMp3Get(
+          sampleId,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     *
+     * @summary Get Original Audio
+     * @param {number} sampleId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getOriginalAudioSampleSampleIdAudioGet(
+      sampleId: number,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getOriginalAudioSampleSampleIdAudioGet(
+          sampleId,
           options
         );
       return createRequestFunction(
@@ -510,17 +567,32 @@ export const AudioApiFactory = function (
   return {
     /**
      *
-     * @summary Get Audio
-     * @param {string} filename
+     * @summary Get Mp3 Audio
+     * @param {number} sampleId
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getAudioAudioFilesFilenameGet(
-      filename: string,
+    getMp3AudioSampleSampleIdMp3Get(
+      sampleId: number,
       options?: any
     ): AxiosPromise<any> {
       return localVarFp
-        .getAudioAudioFilesFilenameGet(filename, options)
+        .getMp3AudioSampleSampleIdMp3Get(sampleId, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @summary Get Original Audio
+     * @param {number} sampleId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getOriginalAudioSampleSampleIdAudioGet(
+      sampleId: number,
+      options?: any
+    ): AxiosPromise<any> {
+      return localVarFp
+        .getOriginalAudioSampleSampleIdAudioGet(sampleId, options)
         .then((request) => request(axios, basePath));
     },
   };
@@ -535,18 +607,35 @@ export const AudioApiFactory = function (
 export class AudioApi extends BaseAPI {
   /**
    *
-   * @summary Get Audio
-   * @param {string} filename
+   * @summary Get Mp3 Audio
+   * @param {number} sampleId
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof AudioApi
    */
-  public getAudioAudioFilesFilenameGet(
-    filename: string,
+  public getMp3AudioSampleSampleIdMp3Get(
+    sampleId: number,
     options?: AxiosRequestConfig
   ) {
     return AudioApiFp(this.configuration)
-      .getAudioAudioFilesFilenameGet(filename, options)
+      .getMp3AudioSampleSampleIdMp3Get(sampleId, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @summary Get Original Audio
+   * @param {number} sampleId
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof AudioApi
+   */
+  public getOriginalAudioSampleSampleIdAudioGet(
+    sampleId: number,
+    options?: AxiosRequestConfig
+  ) {
+    return AudioApiFp(this.configuration)
+      .getOriginalAudioSampleSampleIdAudioGet(sampleId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }

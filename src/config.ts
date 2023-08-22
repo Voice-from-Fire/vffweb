@@ -10,7 +10,7 @@ export const TARGET = "test";
 export const BASEPATH: string =
   // @ts-expect-error TARGET is set manually here
   TARGET === "local"
-    ? "http ://localhost:8000"
+    ? "http://localhost:8000"
     : "https://vff-service-test-beaefp5qmq-ew.a.run.app";
 
 console.log(BASEPATH);
