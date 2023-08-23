@@ -2,5 +2,6 @@ import { Sample } from "../api/api";
 import { BASEPATH } from "../config";
 
 export function audioUrl(sample: Sample): string {
-  return BASEPATH + "/sample/" + sample.id + "/mp3";
+  const key = sample.filename.slice(0, 5);
+  return `${BASEPATH}/sample/${sample.id}/${key}/mp3`;
 }
