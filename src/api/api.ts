@@ -133,6 +133,7 @@ export interface LabelCreate {
 export const LabelType = {
   T: "t",
   G: "g",
+  N: "n",
 } as const;
 
 export type LabelType = (typeof LabelType)[keyof typeof LabelType];
@@ -395,23 +396,26 @@ export const AudioApiAxiosParamCreator = function (
      *
      * @summary Get Mp3 Audio
      * @param {number} sampleId
+     * @param {string} key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getMp3AudioSampleSampleIdMp3Get: async (
+    getMp3AudioSampleSampleIdKeyMp3Get: async (
       sampleId: number,
+      key: string,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'sampleId' is not null or undefined
       assertParamExists(
-        "getMp3AudioSampleSampleIdMp3Get",
+        "getMp3AudioSampleSampleIdKeyMp3Get",
         "sampleId",
         sampleId
       );
-      const localVarPath = `/sample/{sample_id}/mp3`.replace(
-        `{${"sample_id"}}`,
-        encodeURIComponent(String(sampleId))
-      );
+      // verify required parameter 'key' is not null or undefined
+      assertParamExists("getMp3AudioSampleSampleIdKeyMp3Get", "key", key);
+      const localVarPath = `/sample/{sample_id}/{key}/mp3`
+        .replace(`{${"sample_id"}}`, encodeURIComponent(String(sampleId)))
+        .replace(`{${"key"}}`, encodeURIComponent(String(key)));
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -445,23 +449,30 @@ export const AudioApiAxiosParamCreator = function (
      *
      * @summary Get Original Audio
      * @param {number} sampleId
+     * @param {string} key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getOriginalAudioSampleSampleIdAudioGet: async (
+    getOriginalAudioSampleSampleIdKeyAudioGet: async (
       sampleId: number,
+      key: string,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'sampleId' is not null or undefined
       assertParamExists(
-        "getOriginalAudioSampleSampleIdAudioGet",
+        "getOriginalAudioSampleSampleIdKeyAudioGet",
         "sampleId",
         sampleId
       );
-      const localVarPath = `/sample/{sample_id}/audio`.replace(
-        `{${"sample_id"}}`,
-        encodeURIComponent(String(sampleId))
+      // verify required parameter 'key' is not null or undefined
+      assertParamExists(
+        "getOriginalAudioSampleSampleIdKeyAudioGet",
+        "key",
+        key
       );
+      const localVarPath = `/sample/{sample_id}/{key}/audio`
+        .replace(`{${"sample_id"}}`, encodeURIComponent(String(sampleId)))
+        .replace(`{${"key"}}`, encodeURIComponent(String(key)));
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -505,18 +516,21 @@ export const AudioApiFp = function (configuration?: Configuration) {
      *
      * @summary Get Mp3 Audio
      * @param {number} sampleId
+     * @param {string} key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async getMp3AudioSampleSampleIdMp3Get(
+    async getMp3AudioSampleSampleIdKeyMp3Get(
       sampleId: number,
+      key: string,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.getMp3AudioSampleSampleIdMp3Get(
+        await localVarAxiosParamCreator.getMp3AudioSampleSampleIdKeyMp3Get(
           sampleId,
+          key,
           options
         );
       return createRequestFunction(
@@ -530,18 +544,21 @@ export const AudioApiFp = function (configuration?: Configuration) {
      *
      * @summary Get Original Audio
      * @param {number} sampleId
+     * @param {string} key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async getOriginalAudioSampleSampleIdAudioGet(
+    async getOriginalAudioSampleSampleIdKeyAudioGet(
       sampleId: number,
+      key: string,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.getOriginalAudioSampleSampleIdAudioGet(
+        await localVarAxiosParamCreator.getOriginalAudioSampleSampleIdKeyAudioGet(
           sampleId,
+          key,
           options
         );
       return createRequestFunction(
@@ -569,30 +586,34 @@ export const AudioApiFactory = function (
      *
      * @summary Get Mp3 Audio
      * @param {number} sampleId
+     * @param {string} key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getMp3AudioSampleSampleIdMp3Get(
+    getMp3AudioSampleSampleIdKeyMp3Get(
       sampleId: number,
+      key: string,
       options?: any
     ): AxiosPromise<any> {
       return localVarFp
-        .getMp3AudioSampleSampleIdMp3Get(sampleId, options)
+        .getMp3AudioSampleSampleIdKeyMp3Get(sampleId, key, options)
         .then((request) => request(axios, basePath));
     },
     /**
      *
      * @summary Get Original Audio
      * @param {number} sampleId
+     * @param {string} key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getOriginalAudioSampleSampleIdAudioGet(
+    getOriginalAudioSampleSampleIdKeyAudioGet(
       sampleId: number,
+      key: string,
       options?: any
     ): AxiosPromise<any> {
       return localVarFp
-        .getOriginalAudioSampleSampleIdAudioGet(sampleId, options)
+        .getOriginalAudioSampleSampleIdKeyAudioGet(sampleId, key, options)
         .then((request) => request(axios, basePath));
     },
   };
@@ -609,16 +630,18 @@ export class AudioApi extends BaseAPI {
    *
    * @summary Get Mp3 Audio
    * @param {number} sampleId
+   * @param {string} key
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof AudioApi
    */
-  public getMp3AudioSampleSampleIdMp3Get(
+  public getMp3AudioSampleSampleIdKeyMp3Get(
     sampleId: number,
+    key: string,
     options?: AxiosRequestConfig
   ) {
     return AudioApiFp(this.configuration)
-      .getMp3AudioSampleSampleIdMp3Get(sampleId, options)
+      .getMp3AudioSampleSampleIdKeyMp3Get(sampleId, key, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -626,16 +649,18 @@ export class AudioApi extends BaseAPI {
    *
    * @summary Get Original Audio
    * @param {number} sampleId
+   * @param {string} key
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof AudioApi
    */
-  public getOriginalAudioSampleSampleIdAudioGet(
+  public getOriginalAudioSampleSampleIdKeyAudioGet(
     sampleId: number,
+    key: string,
     options?: AxiosRequestConfig
   ) {
     return AudioApiFp(this.configuration)
-      .getOriginalAudioSampleSampleIdAudioGet(sampleId, options)
+      .getOriginalAudioSampleSampleIdKeyAudioGet(sampleId, key, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }

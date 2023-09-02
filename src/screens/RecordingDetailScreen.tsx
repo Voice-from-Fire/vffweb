@@ -66,8 +66,8 @@ function calculateLabelStatistics(labels: Label[] | null): LabelStatistics {
   };
 
   const labelValueCounts: { [type: string]: { [value: number]: number } } = {
-    g: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 },
-    t: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
+    g: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
+    n: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
   };
 
   labels?.forEach((label) => {
@@ -119,7 +119,7 @@ function SampleDetail({
         title={"Gender"}
         labels={genderLabels}
         getColor={(value: number) =>
-          value < 3 ? vff_pink : value > 3 ? vff_blue : "gray"
+          value < 2 ? vff_blue : value > 2 ? vff_pink : "gray"
         }
       />
 

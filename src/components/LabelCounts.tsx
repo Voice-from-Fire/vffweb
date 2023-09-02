@@ -23,24 +23,26 @@ const LabelCounts = ({
           }}
           key={status}
         >
-          <Typography variant="body2" textTransform={"capitalize"}>
-            {status}
-          </Typography>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 40,
+              // display: "flex",
+              // alignItems: "center",
+              // justifyContent: "center",
+              width: 70,
               height: 40,
-              borderRadius: "50%",
               color: "#000",
+              borderRadius: "5px",
               fontWeight: "bold",
               border: "2px solid #000",
               bgcolor: color[status],
             }}
           >
-            {statusCounts[status]}
+            <Box>
+              <Typography variant="body2" textTransform={"capitalize"}>
+                {status}
+              </Typography>
+            </Box>
+            <Box>{statusCounts[status]}</Box>
           </Box>
         </Box>
       ))}

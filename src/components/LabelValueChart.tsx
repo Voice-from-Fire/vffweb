@@ -41,8 +41,8 @@ const LabelValueChart = ({
       <g transform={`translate(${x},${y})`}>
         {label.map((label, index) => (
           <text
-            x={0}
-            y={0}
+            x={10}
+            y={10}
             dy={index * 18}
             textAnchor="end"
             fill="#666"
@@ -75,9 +75,7 @@ const LabelValueChart = ({
 
   return (
     <>
-      <Typography variant="h6">
-        {title} - {width}
-      </Typography>
+      <Typography variant="h6">{title}</Typography>
       <BarChart
         width={width}
         height={300}

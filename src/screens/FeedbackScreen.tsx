@@ -54,7 +54,7 @@ export function FeedbackScreen() {
     sample: null,
   });
   const [audioStatus, setAudioStatus] = useState<AudioStatus>(AudioStatus.Ok);
-  const [genderSliderValue, setGenderSliderValue] = useState<number>(3);
+  const [genderSliderValue, setGenderSliderValue] = useState<number>(2);
   const [naturalSliderValue, setNaturalSliderValue] = useState<number>(2);
   const [uploading, setUploading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
@@ -134,7 +134,7 @@ export function FeedbackScreen() {
           label_value: genderSliderValue,
         },
         {
-          label_type: LabelType.T,
+          label_type: LabelType.N,
           label_value: naturalSliderValue,
         },
       ],
@@ -203,7 +203,7 @@ export function FeedbackScreen() {
                     <Slider
                       id="gender-slider"
                       min={0}
-                      max={6}
+                      max={4}
                       step={1}
                       value={genderSliderValue}
                       onChange={handleGenderSliderChange}
