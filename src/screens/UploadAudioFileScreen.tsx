@@ -16,7 +16,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { addInfo } from "../common/info";
 import axios from "axios";
 import { AudioPlayer } from "../components/AudioPlayer";
-import { Language } from "../api/api";
 import { LanguageDisplay } from "../components/LanguageDisplay";
 import { FileUploader } from "react-drag-drop-files";
 
@@ -77,14 +76,14 @@ function Replay(props: {
               setLanguage(event.target.value)
             }
           >
-            <MenuItem value={Language.En}>
-              <LanguageDisplay language={Language.En} />
+            <MenuItem value={"en"}>
+              <LanguageDisplay language={"en"} />
             </MenuItem>
-            <MenuItem value={Language.Cs}>
-              <LanguageDisplay language={Language.Cs} />
+            <MenuItem value={"cs"}>
+              <LanguageDisplay language={"cs"} />
             </MenuItem>
-            <MenuItem value={Language.Nv}>
-              <LanguageDisplay language={Language.Nv} />
+            <MenuItem value={"NV"}>
+              <LanguageDisplay language={"NV"} />
             </MenuItem>
           </Select>
         </FormControl>

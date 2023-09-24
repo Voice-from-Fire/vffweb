@@ -92,6 +92,12 @@ export interface Label {
   status: AudioStatus;
   /**
    *
+   * @type {number}
+   * @memberof Label
+   */
+  version: number;
+  /**
+   *
    * @type {string}
    * @memberof Label
    */
@@ -122,21 +128,13 @@ export interface LabelCreate {
    * @memberof LabelCreate
    */
   values: Array<LabelTypeAndValue>;
+  /**
+   *
+   * @type {number}
+   * @memberof LabelCreate
+   */
+  version: number;
 }
-
-/**
- * An enumeration.
- * @export
- * @enum {string}
- */
-
-export const LabelType = {
-  T: "t",
-  G: "g",
-  N: "n",
-} as const;
-
-export type LabelType = (typeof LabelType)[keyof typeof LabelType];
 
 /**
  *
@@ -146,10 +144,10 @@ export type LabelType = (typeof LabelType)[keyof typeof LabelType];
 export interface LabelTypeAndValue {
   /**
    *
-   * @type {LabelType}
+   * @type {string}
    * @memberof LabelTypeAndValue
    */
-  label_type: LabelType;
+  label_type: string;
   /**
    *
    * @type {number}
@@ -157,21 +155,6 @@ export interface LabelTypeAndValue {
    */
   label_value: number;
 }
-
-/**
- * An enumeration.
- * @export
- * @enum {string}
- */
-
-export const Language = {
-  Nv: "NV",
-  En: "en",
-  Cs: "cs",
-} as const;
-
-export type Language = (typeof Language)[keyof typeof Language];
-
 /**
  *
  * @export
@@ -213,10 +196,10 @@ export interface Sample {
   duration: number;
   /**
    *
-   * @type {Language}
+   * @type {string}
    * @memberof Sample
    */
-  language: Language;
+  language: string;
   /**
    *
    * @type {string}
@@ -242,7 +225,6 @@ export interface Sample {
    */
   filename: string;
 }
-
 /**
  *
  * @export

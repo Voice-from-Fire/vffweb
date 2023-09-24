@@ -21,7 +21,6 @@ import RecorderService from "../recorder/RecorderService";
 import { addInfo } from "../common/info";
 import axios from "axios";
 import { AudioPlayer } from "../components/AudioPlayer";
-import { Language } from "../api/api";
 import { LanguageDisplay } from "../components/LanguageDisplay";
 import { useStoredPreference } from "../common/preferences";
 
@@ -243,14 +242,14 @@ function Replay(props: {
               setLanguage(event.target.value)
             }
           >
-            <MenuItem value={Language.En}>
-              <LanguageDisplay language={Language.En} />
+            <MenuItem value={"en"}>
+              <LanguageDisplay language={"en"} />
             </MenuItem>
-            <MenuItem value={Language.Cs}>
-              <LanguageDisplay language={Language.Cs} />
+            <MenuItem value={"cs"}>
+              <LanguageDisplay language={"cs"} />
             </MenuItem>
-            <MenuItem value={Language.Nv}>
-              <LanguageDisplay language={Language.Nv} />
+            <MenuItem value={"NV"}>
+              <LanguageDisplay language={"NV"} />
             </MenuItem>
           </Select>
         </FormControl>
@@ -290,7 +289,7 @@ export function NewRecordingScreen() {
   const [recording, setRecording] = useState<Recording | null>(null);
   const [storedLanguage, setStoredLanguage] = useStoredPreference<string>(
     "Language",
-    Language.En
+    "en"
   );
 
   useEffect(

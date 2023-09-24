@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { AudioStatus, LabelCreate, LabelType, Sample } from "../api/api";
+import { AudioStatus, LabelCreate, Sample } from "../api/api";
 import { audioUrl } from "../common/audio";
 import {
   callGuard,
@@ -128,13 +128,14 @@ export function FeedbackScreen() {
     setSuccess(false);
     const labelCreate = {
       status: audioStatus,
+      version: 0,
       values: [
         {
-          label_type: LabelType.G,
+          label_type: "g",
           label_value: genderSliderValue,
         },
         {
-          label_type: LabelType.N,
+          label_type: "n",
           label_value: naturalSliderValue,
         },
       ],

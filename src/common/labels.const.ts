@@ -15,9 +15,9 @@ export const genderLabels: { [value: number]: string } = {
 };
 
 export const naturalLabels: { [value: number]: string } = {
-  0: "0/4",
-  1: "1/4",
-  2: "2/4",
-  3: "3/4",
-  4: "4/4",
+  0: "1/5",
+  1: "2/5",
+  2: "3/5",
+  3: "4/5",
+  4: "5/5",
 };
