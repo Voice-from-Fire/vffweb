@@ -1,4 +1,4 @@
-import { LabelsApi, SamplesApi, UsersApi } from "../api/api";
+import { AudioApi, LabelsApi, SamplesApi, UsersApi } from "../api/api";
 import { Configuration } from "../api/configuration";
 import { getLoggedUser } from "./user";
 import { addInfo } from "./info";
@@ -23,6 +23,10 @@ export function createSamplesApi(): SamplesApi {
 
 export function createLabelsApi(): LabelsApi {
   return new LabelsApi(createConfig());
+}
+
+export function createAudioFilesApi(): AudioApi {
+  return new AudioApi(createConfig());
 }
 
 export async function callGuard<T>(
