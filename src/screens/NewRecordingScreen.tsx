@@ -23,6 +23,7 @@ import axios from "axios";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { LanguageDisplay } from "../components/LanguageDisplay";
 import { useStoredPreference } from "../common/preferences";
+import { mean } from "lodash-es";
 
 type Recording = {
   blobUrl: string;
@@ -72,10 +73,14 @@ async function getAudioInputDevices(): Promise<AudioInput[]> {
     }));
 }
 
-function Recorder(props: { setRecording: (r: Recording) => void }) {
+function Recorder(props: {
+  setRecording: (r: Recording) => void;
+  visualize?: boolean;
+}) {
   const [service, setService] = useState<RecorderService | null>(null);
   const [handler, setHandler] = useState<NodeJS.Timer | null>(null);
   const [time, setTime] = useState<number>(0);
+  const [fftBuffer, setFftBuffer] = useState<Uint8Array | null>(null);
   const [audioInput, setAudioInput] = useStoredPreference<AudioInput | null>(
     "AudioInput",
     null
@@ -83,6 +88,7 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
   const [availableAudioInputs, setAvailableAudioInputs] = useState<
     AudioInput[]
   >([]);
+  const visualize = props.visualize ?? true;
 
   useEffect(() => {
     getAudioInputDevices().then((devices) => {
@@ -120,6 +126,7 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
     rec.em.addEventListener("error", (evt) => {
       console.log(evt);
     });
+    if (visualize) rec.config.createAnalyserNode = true;
     setService(rec);
     rec
       .startRecording()
@@ -132,6 +139,11 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
         const startTime = new Date().getTime();
         const handler = setInterval(() => {
           setTime(new Date().getTime() - startTime);
+
+          rec.analyserNode.smoothingTimeConstant = 0.1;
+          const buffer = new Uint8Array(rec.analyserNode.frequencyBinCount);
+          rec.analyserNode.getByteFrequencyData(buffer);
+          setFftBuffer(buffer);
         }, 100);
 
         rec.em.addEventListener("recording", (evt) => {
@@ -152,6 +164,11 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
         setHandler(handler);
       });
   };
+
+  // Compute desired radius of the indicator circle
+  const mean_fft = Math.max(1.0, mean(fftBuffer ?? [0]));
+  const volume_radius = Math.max(0.0, (Math.log2(mean_fft) - 5) / 3) * 45;
+  console.log([mean_fft, volume_radius]);
 
   const hasAudioInputs = availableAudioInputs.length > 0 && audioInput !== null;
   return (
@@ -179,23 +196,51 @@ function Recorder(props: { setRecording: (r: Recording) => void }) {
           </FormControl>
         )}
       </Grid>
-      <Grid item style={{ margin: "25px" }}>
-        {handler ? (
-          <Fab
-            sx={pauseFabStyle}
-            onClick={() => {
-              clearInterval(handler!);
-              setHandler(null);
-              service?.stopRecording();
+      <Grid item style={{}}>
+        <div
+          style={{
+            width: 300,
+            height: 300,
+            display: "inline-block",
+            position: "relative",
+          }}
+        >
+          <svg viewBox="0 0 100 100" width={300} height={300}>
+            <circle
+              r={volume_radius}
+              cx={50}
+              cy={50}
+              style={{ fill: "#00000020", stroke: "#00000030" }}
+            ></circle>
+          </svg>
+          <div
+            style={{
+              display: "inline-block",
+              width: 300,
+              height: 150,
+              position: "absolute",
+              top: 110,
+              left: 0,
             }}
           >
-            <PauseIcon sx={iconStyle} />
-          </Fab>
-        ) : (
-          <Fab sx={micFabStyle} onClick={startRecording}>
-            <MicIcon sx={iconStyle} />
-          </Fab>
-        )}
+            {handler ? (
+              <Fab
+                sx={pauseFabStyle}
+                onClick={() => {
+                  clearInterval(handler!);
+                  setHandler(null);
+                  service?.stopRecording();
+                }}
+              >
+                <PauseIcon sx={iconStyle} />
+              </Fab>
+            ) : (
+              <Fab sx={micFabStyle} onClick={startRecording}>
+                <MicIcon sx={iconStyle} />
+              </Fab>
+            )}
+          </div>
+        </div>
       </Grid>
       <Grid item>
         <Typography>
