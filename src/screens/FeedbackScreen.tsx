@@ -119,7 +119,7 @@ export function FeedbackScreen() {
 
   const resetForm = () => {
     setAudioStatus(AudioStatus.Ok);
-    setGenderSliderValue(3);
+    setGenderSliderValue(2);
     setNaturalSliderValue(2);
   };
 
